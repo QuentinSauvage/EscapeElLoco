@@ -3,8 +3,6 @@
 
 #include "object.hpp"
 
-#define DEFAULT_TIMER 2000
-
 class Block : public Object {
 	public:
 		bool displayed;

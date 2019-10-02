@@ -8,10 +8,8 @@ using namespace std;
 
 GameLogic::GameLogic() : level(1) {
 	extractMap();
-	players[0].x = 8 * 64;
-	players[0].y = 26 * 64;
-	players[1].x = 33 * 64;
-	players[1].y = 26 * 64;
+	players[0].init(POSX1, POSY);
+	players[1].init(POSX2, POSY);
 }
 
 void GameLogic::increaseLevel() {
@@ -21,10 +19,10 @@ void GameLogic::increaseLevel() {
 //extract map from file
 void GameLogic::extractMap() {
 	ifstream levelMap;
-	string filename = "levels/level";
+	string filename = PATH_LEVEL;
 	char c;
 	int tmp;
-	filename += to_string(level) + ".csv";
+	filename += to_string(level) + CSV;
 	levelMap.open(filename.c_str());
 
 	if(levelMap.good()) {
@@ -38,7 +36,7 @@ void GameLogic::extractMap() {
 			map.map.push_back(v);
 		}
 		levelMap.close();
-	} else cerr << "Error while reading map\n";
+	} else cerr << LOAD_MAP_ERROR;
 }
 
 //handle inputs from the user

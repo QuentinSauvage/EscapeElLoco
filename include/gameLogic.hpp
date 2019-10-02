@@ -6,6 +6,13 @@
 #include "player.hpp"
 #include "block.hpp"
 
+#define POSX1 512
+#define POSX2 2112
+#define POSY 1664
+#define PATH_LEVEL "levels/level"
+#define CSV ".csv"
+#define LOAD_MAP_ERROR "Error while reading map\n"
+
 class GameLogic {
 	public:
 		struct Map {

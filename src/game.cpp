@@ -3,12 +3,14 @@
 using namespace sf;
 using namespace std;
 
+#define MINUTE 60.0f
+
 Game::Game() : gameLogic(), gameGraphics(gameLogic) {
     run();
 }
 
 void Game::run() {
-    deltaTime = 1.0f / 60.0f;
+    deltaTime = 1.0f / MINUTE;
     Clock clock;
     Event event;
     while (gameGraphics.window.isOpen())

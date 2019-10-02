@@ -9,24 +9,16 @@ GameGraphics::GameGraphics(GameLogic &gl) : gameLogic(gl) {
 }
 
 void GameGraphics::loadTextures() {
-    if (!playersTexture[0].loadFromFile("sprites/dino/3.png"))
-    {
-        std::cerr << "Error when loading character sprite" << std::endl;
-        return;
+    if (!playersTexture[0].loadFromFile(PLAYER3_SPRITE)) {
+        std::cerr << LOAD_PLAYER_SPRITE_ERROR << std::endl;
+        exit(1);
     }
-    if (!playersTexture[1].loadFromFile("sprites/dino/4.png"))
-    {
-        std::cerr << "Error when loading character sprite" << std::endl;
-        return;
-    }
-    //castle-tileset : 16x16
-    //freetileset : 128x128
-    //Nature Platformer : 16x16
-    //Retro_pixel_plains : 8x8
+    if (!playersTexture[1].loadFromFile(PLAYER4_SPRITE))
+        std::cerr <<  LOAD_PLAYER_SPRITE_ERROR << std::endl;
 
-    if(!background.loadFromFile("sprites/tileset1.png")) {
-        std::cerr << "Error when loading map tileset" << std::endl;
-        return;
+    if(!background.loadFromFile(LOAD_TILESET)) {
+        std::cerr << LOAD_TILESET_ERROR << std::endl;
+        exit(1);
     }
     sf::Sprite s;
     for(int i = 0; i < gameLogic.map.height; i++) {
@@ -34,51 +26,55 @@ void GameGraphics::loadTextures() {
         for(int j = 0; j < gameLogic.map.width; j++) {
             s.setTexture(background);
             int tileNumber = gameLogic.map.map[i][j];
-            if(tileNumber == -1)
-                continue;
-            s.setTextureRect(sf::IntRect((tileNumber % 8) * 16, (tileNumber / 8) * 16, 16, 16));
-            s.setPosition(j * 64, i * 64);
-            s.setScale(4.f,4.f);
-            v.push_back(s);
+            if(tileNumber >= 0) {
+                s.setTextureRect(sf::IntRect((tileNumber % 8) << 4, (tileNumber >> 3) << 4, 16, 16));
+                s.setPosition(j << 6, i << 6);
+                s.setScale(4.f,4.f);
+                v.push_back(s);
+            }
         }
         map.push_back(v);
     }
 }
 
-//viewLeft and viewRight should only draw their part
-void GameGraphics::drawBackground() {
+void GameGraphics::drawBackground(int i) {
+    int begin, end;
+    if(i) {
+        begin = lim;
+        end = gameLogic.map.width;
+    } else {
+        begin = 0;
+        end = lim;
+    }
     for(int i = 0; i < gameLogic.map.height; i++)
-        for(int j = 0; j < gameLogic.map.width; j++)
+        for(int j = begin; j < end; j++)
             window.draw(map[i][j]);
 }
 
 void GameGraphics::buildWindow() {
 	VideoMode screen = VideoMode::getDesktopMode();
-    window.create(VideoMode(screen.width * 0.75, screen.height * 0.75), "Top Secret");
-    window.setPosition(Vector2i((screen.width / 2) - (window.getSize().x / 2), (screen.height / 2) - (window.getSize().y / 2)));
+    window.create(VideoMode(screen.width * 0.75, screen.height * 0.75), TITLE, Style::Titlebar | Style::Close);
+    window.setPosition(Vector2i((screen.width >> 1) - (window.getSize().x >> 1), (screen.height >> 1) - (window.getSize().y >> 1)));
 	window.setFramerateLimit(60);
 
-    if(!font.loadFromFile("fonts/mismo/Mismo Black.ttf")) {
-        std::cerr << "Error when loading Mismo Black.ttf" << std::endl;
+    if(!font.loadFromFile(LOAD_FONT)) {
+        std::cerr << LOAD_FONT_ERROR << std::endl;
         return;
     }
 
     loadTextures();
 
-    blinkTime = BLINK_RATE;
+    //blinkTime = BLINK_RATE;
 
-    playersSprite[0].setTexture(playersTexture[0]);
-    playersSprite[0].setTextureRect(sf::IntRect(0, 0, 24, 24));
-    playersSprite[0].setPosition(gameLogic.players[0].x, gameLogic.players[0].y);
-    playersSprite[0].setScale(3.f,3.f);
-
-    playersSprite[1].setTexture(playersTexture[1]);
-    playersSprite[1].setTextureRect(sf::IntRect(0, 0, 24, 24));
-    playersSprite[1].setPosition(gameLogic.players[1].x, gameLogic.players[1].y);
-    playersSprite[1].setScale(3.f,3.f);
+    for(int i = 0; i < 2; i++) {
+        playersSprite[i].setTexture(playersTexture[i]);
+        playersSprite[i].setTextureRect(sf::IntRect(0, 0, PLAYER_DIM, PLAYER_DIM));
+        playersSprite[i].setPosition(gameLogic.players[i].x, gameLogic.players[i].y);
+        playersSprite[i].setScale(3.f,3.f);
+    }
 
     framerateText.setFont(font);
-    framerateText.setCharacterSize(24);
+    framerateText.setCharacterSize(FRAMERATE_FONT_SIZE);
     framerateText.setFillColor(Color::White);
     framerateText.setOutlineThickness(1);
     framerateText.setOutlineColor(Color::Blue);
@@ -90,11 +86,13 @@ void GameGraphics::buildWindow() {
     border.setFillColor(Color(192,192,192));
 
     //setCenter: x: clamp(player.x,8,17), y: clamp(player.y,8,22)
-    viewLeft.setCenter(8*64, 22*64);
+    viewLeft.setCenter(LEFT_CENTER_X, CENTER_Y);
     viewLeft.setViewport(FloatRect(0.f, 0.f, 0.498f, 1.f));
     //setCenter: x: clamp(player.x,33,42), y: clamp(player.y,8,22)
-    viewRight.setCenter(33*64, 22*64);
+    viewRight.setCenter(RIGHT_CENTER_X, CENTER_Y);
     viewRight.setViewport(FloatRect(0.501f, 0.f, 0.498f, 1.f));
+
+    lim = gameLogic.map.width >> 1;
 }
 
 float clamp(float v, float min, float max) {
@@ -118,18 +116,18 @@ void GameGraphics::update(float deltaTime) {
     playersSprite[1].setPosition(gameLogic.players[1].x, gameLogic.players[1].y);
 
     //Draw
-    viewLeft.setCenter(clamp(gameLogic.players[0].x,8*64,17*64), clamp(gameLogic.players[0].y,8*64,22*64));
-    viewRight.setCenter(clamp(gameLogic.players[1].x,33*64,42*64), clamp(gameLogic.players[1].y,8*64,22*64));
+    viewLeft.setCenter(clamp(gameLogic.players[0].x,LEFT_CENTER_X,BOUND_X1), clamp(gameLogic.players[0].y,BOUND_MIN_Y, BOUND_MAX_Y));
+    viewRight.setCenter(clamp(gameLogic.players[1].x,RIGHT_CENTER_X,BOUND_X2), clamp(gameLogic.players[1].y,BOUND_MIN_Y, BOUND_MAX_Y));
     window.setView(window.getDefaultView());
     window.clear(Color::Black);    
 
     window.setView(viewLeft);
     window.draw(playersSprite[0]);
-    drawBackground();
+    drawBackground(0);
 
     window.setView(viewRight);
     window.draw(playersSprite[1]);
-    drawBackground();
+    drawBackground(1);
     
     window.setView(window.getDefaultView());
     window.draw(framerateText);
