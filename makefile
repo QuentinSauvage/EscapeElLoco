@@ -1,6 +1,6 @@
 #-Wextra  -pedantic -Wno-unused-parameter -Wall -Wextra -ansi
 CFLAGS = -std=c++11 -Wall
-SFML = -lsfml-graphics -lsfml-window -lsfml-system
+SFML = -lsfml-graphics -lsfml-audio -lsfml-window -lsfml-system
 EXEC = app
 
 #BOOST = -I boost

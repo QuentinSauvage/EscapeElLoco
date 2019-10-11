@@ -1,25 +1,29 @@
+#include <SFML/Audio.hpp>
+#include <iostream>
 #include "game.hpp"
 
 using namespace sf;
 using namespace std;
 
-#define MINUTE 60.0f
-
-Game::Game() : gameLogic(), gameGraphics(gameLogic) {
+Game::Game() : gameAudio(), gameLogic(gameAudio), gameGraphics(gameLogic) {
     run();
 }
 
 void Game::run() {
-    deltaTime = 1.0f / MINUTE;
+    deltaTime = 1.0f/MINUTE;
     Clock clock;
     Event event;
-    while (gameGraphics.window.isOpen())
+    gameAudio.load();
+    while(gameGraphics.window.isOpen())
     {
-        while (gameGraphics.window.pollEvent(event))
-            if (event.type == Event::Closed)
+        while(gameGraphics.window.pollEvent(event)) {
+            if(event.type == Event::Closed)
                 gameGraphics.window.close();
+            else if(event.type == Event::LostFocus) gameLogic.pause = true;
+            else if(event.type == Event::GainedFocus) gameLogic.pause = false;
+        }
 
-        gameLogic.update(deltaTime);
+        gameLogic.update(deltaTime, gameGraphics.map);
         gameGraphics.update(deltaTime);
         
         deltaTime = clock.getElapsedTime().asSeconds();

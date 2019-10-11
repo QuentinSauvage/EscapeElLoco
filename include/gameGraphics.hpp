@@ -5,9 +5,7 @@
 #include <vector>
 #include "gameLogic.hpp"
 
-#define PLAYER3_SPRITE "sprites/dino/3.png"
-#define PLAYER4_SPRITE "sprites/dino/4.png"
-#define LOAD_PLAYER_SPRITE_ERROR "Error when loading character sprite"
+
 #define LOAD_TILESET "sprites/tileset1.png"
 #define LOAD_TILESET_ERROR "Error when loading map tileset"
 #define LOAD_FONT "fonts/mismo/Mismo Black.ttf"
@@ -21,7 +19,9 @@
 #define BOUND_X1 1088
 #define BOUND_X2 2688
 #define FRAMERATE_FONT_SIZE 24
-#define PLAYER_DIM 24
+#define FRAMERATE 60
+#define TILE_DIM 64
+#define EMPTY 98
 
 class GameGraphics {
 	public:
@@ -30,10 +30,9 @@ class GameGraphics {
 		sf::Text framerateText;
 		sf::Font font;
 		sf::Color color;
-    	sf::Texture playersTexture[2];
     	sf::Texture background;
     	std::vector<std::vector<sf::Sprite>> map;
-    	sf::Sprite playersSprite[2];
+		sf::Texture playersTexture[2];
     	sf::View viewLeft, viewRight;
     	sf::RectangleShape border;
 		float framerate;
@@ -41,9 +40,10 @@ class GameGraphics {
 		int lim;
 		
 		GameGraphics(GameLogic &gl);
+		void init();
 		void update(float deltaTime);
-		void loadTextures();
-		void drawBackground(int i);
+		void load();
+		void drawBackground(int k);
 		void buildWindow();
 
 		~GameGraphics();
