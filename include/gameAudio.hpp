@@ -7,12 +7,13 @@
 #define LOAD_JUMP_ERROR "Error when loading jump sound"
 #define JUMP_AUDIO_PATH "audio/jump.wav"
 #define MUSIC_PATH "audio/music.wav"
+#define VOLUME 30
 
 class GameAudio {
 	public:
         sf::Music music;
-        sf::SoundBuffer jump_audio;
-		sf::Sound jump_sound;
+        sf::SoundBuffer jumpAudio;
+		sf::Sound jumpSoundLeft,jumpSoundRight;
         bool playing;
 
 		GameAudio();

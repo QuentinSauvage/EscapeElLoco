@@ -30,14 +30,12 @@ class GameGraphics {
 		sf::Text framerateText;
 		sf::Font font;
 		sf::Color color;
-    	sf::Texture background;
+    	sf::Texture background,playersTexture[2];
     	std::vector<std::vector<sf::Sprite>> map;
-		sf::Texture playersTexture[2];
     	sf::View viewLeft, viewRight;
     	sf::RectangleShape border;
-		float framerate;
-		float blinkTime;
-		int lim;
+		float framerate,blinkTime;
+		int screenLimit;
 		
 		GameGraphics(GameLogic &gl);
 		void init();

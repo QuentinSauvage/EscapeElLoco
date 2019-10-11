@@ -15,10 +15,11 @@
 #define CSV ".csv"
 #define LOAD_MAP_ERROR "Error while reading map\n"
 #define JUMP_VELOCITY 1000
-#define GRAVITY 50
+#define GRAVITY 2500
 #define PLAYER_DIM_SCALED 32
 #define TILE_DIM 64
 #define EMPTY 98
+#define COIN 65
 #define PLAYER3_SPRITE "sprites/dino/3.png"
 #define PLAYER4_SPRITE "sprites/dino/4.png"
 
@@ -31,20 +32,20 @@ class GameLogic {
 		GameAudio &gameAudio;
 		int level;
 		float timer;
-		bool pause;
+		bool pause,interactEvent;
 		Map map;
-		std::vector<Block> blocks;
+		std::vector<Block*> blocks;
 		Player players[2];
 
 		GameLogic(GameAudio &audio);
-		void increaseLevel();
 		void extractMap();
 		void handleEvents(float deltaTime);
-		void setPlayerSprite(int p_index, sf::Sprite &s);
-		void jump(int p_index, std::vector<std::vector<sf::Sprite>> &map, float dt);
-		void handleCollisions(int p_index, std::vector<std::vector<sf::Sprite>> &map, float dt);
-		void update(float deltaTime, std::vector<std::vector<sf::Sprite>> &map);
-		void testCollisions(int p_index, std::vector<std::vector<sf::Sprite>> &map, float dt);
+		void jump(int p_index,std::vector<std::vector<sf::Sprite>> &map,float dt);
+		void handleCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &map,float dt);
+		void update(float deltaTime,std::vector<std::vector<sf::Sprite>> &map);
+		void testCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &map,float dt);
+		bool isSolid(int tile,int p_index);
+		void interact(int indX,int indY);
 
 		~GameLogic();
 };

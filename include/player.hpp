@@ -2,7 +2,7 @@
 #define _PLAYER_H_
 
 #include <SFML/Graphics.hpp>
-#include "object.hpp"
+#include "entity.hpp"
 #include <string>
 
 #define LOAD_PLAYER_SPRITE_ERROR "Error when loading character sprite"
@@ -20,17 +20,18 @@
 #define TIMER_IDLE 0.7f
 #define TIMER_RUN 0.1f
 
-class Player : public Object {
+class Player : public Entity {
 	public:
-		int life, maxLife, state;
-		float speed, vx, vy, dx, dy, timerIdle, timerRun;
+		int life,maxLife,state;
+		float speed,vx,vy,timerIdle,timerRun;
+		bool coinTaken;
 		sf::Sprite sprite;
 		sf::Texture texture;
 		sf::IntRect spriteRect;
 
 		Player();
-		void init(float x, float y, std::string path);
-		void move(int dir, float deltaTime);
+		void init(float x,float y,std::string path);
+		void move(int dir,float deltaTime);
 		void setSprite(sf::Texture &t);
 		void animate(float timer);
 

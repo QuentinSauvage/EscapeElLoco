@@ -9,11 +9,11 @@ GameGraphics::GameGraphics(GameLogic &gl) : gameLogic(gl) {
 }
 
 void GameGraphics::load() {
-    if (!playersTexture[0].loadFromFile(PLAYER3_SPRITE)) {
+    if(!playersTexture[0].loadFromFile(PLAYER3_SPRITE)) {
         std::cerr << LOAD_PLAYER_SPRITE_ERROR << std::endl;
         exit(1);
     }
-    if (!playersTexture[1].loadFromFile(PLAYER4_SPRITE)) {
+    if(!playersTexture[1].loadFromFile(PLAYER4_SPRITE)) {
         std::cerr << LOAD_PLAYER_SPRITE_ERROR << std::endl;
         exit(1);
     }
@@ -27,52 +27,51 @@ void GameGraphics::load() {
     }
     
     sf::Sprite s;
-    for(int i = 0; i < gameLogic.map.height; i++) {
+    for(int i=0; i<gameLogic.map.height;i++) {
         std::vector<Sprite> v;
-        for(int j = 0; j < gameLogic.map.width; j++) {
+        for(int j=0; j<gameLogic.map.width;j++) {
             s.setTexture(background);
-            int tileNumber = gameLogic.map.map[i][j];
-            if(tileNumber >= 0) {
-                s.setTextureRect(sf::IntRect((tileNumber % 8) << 4, (tileNumber >> 3) << 4, 16, 16));
-                s.setPosition(j << 6, i << 6);
+            int tileNumber=gameLogic.map.map[i][j];
+            if(tileNumber>=0) {
+                s.setTextureRect(sf::IntRect((tileNumber%8)<<4,(tileNumber>>3)<<4,16,16));
+                s.setPosition(j<<6,i<<6);
                 s.setScale(4.f,4.f);
                 v.push_back(s);
             }
         }
         map.push_back(v);
     }
-    for(int i = 0; i < 2; i++)
-        gameLogic.players[i].setSprite(playersTexture[i]);
+    for(int i=0;i<2;i++) gameLogic.players[i].setSprite(playersTexture[i]);
 }
 
 //Each view only draw their part of the screen
 void GameGraphics::drawBackground(int k) {
-    int begin, end;
+    int begin,end;
     if(k) {
-        begin = lim;
-        end = gameLogic.map.width;
+        begin=screenLimit;
+        end=gameLogic.map.width;
     } else {
-        begin = 0;
-        end = lim;
+        begin=0;
+        end=screenLimit;
     }
-    for(int i = 0; i < gameLogic.map.height; i++)
-        for(int j = begin; j < end; j++)
+    for(int i=0;i<gameLogic.map.height;i++)
+        for(int j=begin;j<end;j++)
             window.draw(map[i][j]);
 }
 
 void GameGraphics::buildWindow() {
-    VideoMode screen = VideoMode::getDesktopMode();
-    window.create(VideoMode(screen.width * 0.75, screen.height * 0.75), TITLE, Style::Titlebar | Style::Close);
-    window.setPosition(Vector2i((screen.width >> 1) - (window.getSize().x >> 1), (screen.height >> 1) - (window.getSize().y >> 1)));
+    VideoMode screen=VideoMode::getDesktopMode();
+    window.create(VideoMode(screen.width*0.75, screen.height*0.75),TITLE,Style::Titlebar|Style::Close);
+    window.setPosition(Vector2i((screen.width>>1)-(window.getSize().x>>1),(screen.height>>1)-(window.getSize().y>>1)));
 	window.setFramerateLimit(FRAMERATE);
 
-    viewLeft.setCenter(LEFT_CENTER_X, CENTER_Y);
-    viewLeft.setViewport(FloatRect(0.f, 0.f, 0.498f, 1.f));
-    viewRight.setCenter(RIGHT_CENTER_X, CENTER_Y);
-    viewRight.setViewport(FloatRect(0.501f, 0.f, 0.498f, 1.f));
+    viewLeft.setCenter(LEFT_CENTER_X,CENTER_Y);
+    viewLeft.setViewport(FloatRect(0.f,0.f,0.498f,1.f));
+    viewRight.setCenter(RIGHT_CENTER_X,CENTER_Y);
+    viewRight.setViewport(FloatRect(0.501f,0.f,0.498f,1.f));
 
-    float sizeX = (window.getSize().x * 0.004f);
-	border.setPosition((window.getSize().x / 2) - (sizeX / 2),0);
+    float sizeX=(window.getSize().x*0.004f);
+	border.setPosition((window.getSize().x/2)-(sizeX/2),0);
     border.setSize(sf::Vector2f(sizeX,window.getSize().y));
     border.setFillColor(Color(192,192,192));
 }
@@ -85,35 +84,33 @@ void GameGraphics::init() {
     framerateText.setFillColor(Color::White);
     framerateText.setOutlineThickness(1);
     framerateText.setOutlineColor(Color::Blue);
-    framerateText.setPosition(window.getSize().x - 100, 0);
-    lim = gameLogic.map.width >> 1;
+    framerateText.setPosition(window.getSize().x-100,0);
+    screenLimit=gameLogic.map.width>>1;
 }
 
-float clamp(float v, float min, float max) {
-    if(v < min)
-        return min;
-    if(v > max)
-        return max;
+float clamp(float v,float min,float max) {
+    if(v<min) return min;
+    if(v>max) return max;
     return v; 
 }
 
 void GameGraphics::update(float deltaTime) {
-	framerate = 1.f / (deltaTime);
-	framerateText.setString(std::to_string((int) ceil(framerate)) + " fps");    
+	framerate=1.f/(deltaTime);
+	framerateText.setString(std::to_string((int)ceil(framerate))+" fps");    
 
     //Draw
-    viewLeft.setCenter(clamp(gameLogic.players[0].x,LEFT_CENTER_X,BOUND_X1), clamp(gameLogic.players[0].y,BOUND_MIN_Y, BOUND_MAX_Y));
-    viewRight.setCenter(clamp(gameLogic.players[1].x,RIGHT_CENTER_X,BOUND_X2), clamp(gameLogic.players[1].y,BOUND_MIN_Y, BOUND_MAX_Y));
+    viewLeft.setCenter(clamp(gameLogic.players[0].x,LEFT_CENTER_X,BOUND_X1),clamp(gameLogic.players[0].y,BOUND_MIN_Y,BOUND_MAX_Y));
+    viewRight.setCenter(clamp(gameLogic.players[1].x,RIGHT_CENTER_X,BOUND_X2),clamp(gameLogic.players[1].y,BOUND_MIN_Y,BOUND_MAX_Y));
     window.setView(window.getDefaultView());
     window.clear(Color::Black);    
 
     window.setView(viewLeft);
-    window.draw(gameLogic.players[0].sprite);
     drawBackground(0);
+    window.draw(gameLogic.players[0].sprite);
 
     window.setView(viewRight);
-    window.draw(gameLogic.players[1].sprite);
     drawBackground(1);
+    window.draw(gameLogic.players[1].sprite);
     
     window.setView(window.getDefaultView());
     window.draw(framerateText);

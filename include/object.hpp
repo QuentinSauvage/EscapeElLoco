@@ -1,13 +1,37 @@
 #ifndef _OBJECT_H_
 #define _OBJECT_H_
 
-class Object {
-	public:
-		float x,y,scale,rotation;
+#include "entity.hpp"
 
-		Object();
-		Object(float x, float y, float scale, float rotation);
-		~Object();
+class Door : public Entity {
+	public:		
+		Door();
+		~Door();
+};
+
+class Rope : public Entity {
+	public:
+		Rope();
+		~Rope();
+};
+
+class Coin : public SidedEntity {
+	public:
+		Coin();
+		~Coin();
+};
+
+class Key : public SidedEntity {
+	public:
+		bool displayed;
+		Key(float t);
+		~Key();
+};
+
+class Chest : public SidedEntity {
+	public:
+		Chest();
+		~Chest();
 };
 
 #endif
