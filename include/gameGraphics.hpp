@@ -39,6 +39,7 @@ class GameGraphics {
 		
 		GameGraphics(GameLogic &gl);
 		void init();
+		void checkUpdate();
 		void update(float deltaTime);
 		void load();
 		void drawBackground(int k);

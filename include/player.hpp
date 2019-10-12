@@ -3,7 +3,10 @@
 
 #include <SFML/Graphics.hpp>
 #include "entity.hpp"
+#include "object.hpp"
+#include "block.hpp"
 #include <string>
+#include <vector>
 
 #define LOAD_PLAYER_SPRITE_ERROR "Error when loading character sprite"
 #define DEFAULT_MAX_LIFE 3
@@ -28,6 +31,11 @@ class Player : public Entity {
 		sf::Sprite sprite;
 		sf::Texture texture;
 		sf::IntRect spriteRect;
+		std::vector<CoinBlock> coinBlocks;
+		std::vector<Coin> coins;
+		Coin coin;
+		Key key;
+		Chest chest;
 
 		Player();
 		void init(float x,float y,std::string path);

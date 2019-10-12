@@ -20,6 +20,9 @@
 #define TILE_DIM 64
 #define EMPTY 98
 #define COIN 65
+#define COIN_BLOCK 25
+#define TIMER_BLOCK 12
+#define COLLAPSE_BLOCK 66
 #define PLAYER3_SPRITE "sprites/dino/3.png"
 #define PLAYER4_SPRITE "sprites/dino/4.png"
 
@@ -29,23 +32,29 @@ class GameLogic {
 			int height,width;
 			std::vector<std::vector<int>> map;
 		};
+		struct Modif {
+			int x,y,value;
+		};
 		GameAudio &gameAudio;
 		int level;
 		float timer;
 		bool pause,interactEvent;
 		Map map;
-		std::vector<Block*> blocks;
+		std::vector<Modif> modifs;
+		std::vector<TimerBlock> timerBlocks;
+		std::vector<CollapseBlock> collapseBlocks;
+		Coin coins[2];
 		Player players[2];
 
 		GameLogic(GameAudio &audio);
 		void extractMap();
 		void handleEvents(float deltaTime);
-		void jump(int p_index,std::vector<std::vector<sf::Sprite>> &map,float dt);
-		void handleCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &map,float dt);
-		void update(float deltaTime,std::vector<std::vector<sf::Sprite>> &map);
-		void testCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &map,float dt);
+		void jump(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
+		void handleCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
+		void update(float deltaTime,std::vector<std::vector<sf::Sprite>> &gmap);
+		void testCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		bool isSolid(int tile,int p_index);
-		void interact(int indX,int indY);
+		void interact(int p_index,int indX,int indY);
 
 		~GameLogic();
 };

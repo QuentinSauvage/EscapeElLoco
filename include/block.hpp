@@ -3,35 +3,38 @@
 
 #include "entity.hpp"
 
-#define FALLABLE_TIMER 3.0f
+#define TIMER_COLLAPSE_TIMER 3.0f
+#define TIMER_BLOCK_TIMER 2.0f
 
-class Block : public virtual Entity {
+class Block : public Entity {
 	public:
 		bool displayed;
 		float timer;
 		
 		Block();
-		Block(bool displayed,float timer,float x,float y,float scale,float rotation);
+		Block(float x,float y,float t,bool d,float s,float r);
 
 		~Block();
 };
 
-class FallableBlock : public Block {
+class CollapseBlock : public Block {
 	public:
-		FallableBlock();
-		~FallableBlock();
+		CollapseBlock();
+		CollapseBlock(float x,float y,float t,float s,float r);
+		~CollapseBlock();
 };
 
 class TimerBlock : public Block {
 	public:
-		float timer;
-		TimerBlock(float t);
+		TimerBlock();
+		TimerBlock(float x,float y,float t,bool d,float s,float r);
 		~TimerBlock();
 };
 
-class CoinBlock : public Block, public SidedEntity {
+class CoinBlock : public Block {
 	public:
 		CoinBlock();
+		CoinBlock(float x,float y,float t,float s,float r);
 		~CoinBlock();
 };
 

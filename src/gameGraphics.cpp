@@ -32,16 +32,20 @@ void GameGraphics::load() {
         for(int j=0; j<gameLogic.map.width;j++) {
             s.setTexture(background);
             int tileNumber=gameLogic.map.map[i][j];
-            if(tileNumber>=0) {
-                s.setTextureRect(sf::IntRect((tileNumber%8)<<4,(tileNumber>>3)<<4,16,16));
-                s.setPosition(j<<6,i<<6);
-                s.setScale(4.f,4.f);
-                v.push_back(s);
-            }
+            s.setTextureRect(IntRect((tileNumber%8)<<4,(tileNumber>>3)<<4,16,16));
+            s.setPosition(j<<6,i<<6);
+            s.setScale(4.f,4.f);
+            v.push_back(s);
         }
         map.push_back(v);
     }
     for(int i=0;i<2;i++) gameLogic.players[i].setSprite(playersTexture[i]);
+}
+
+void GameGraphics::checkUpdate() {
+    for(size_t i=0;i<gameLogic.modifs.size();i++){
+        map[gameLogic.modifs[i].y][gameLogic.modifs[i].x].setTextureRect(IntRect((gameLogic.modifs[i].value%8)<<4,(gameLogic.modifs[i].value>>3)<<4,16,16));
+    }
 }
 
 //Each view only draw their part of the screen
@@ -97,6 +101,8 @@ float clamp(float v,float min,float max) {
 void GameGraphics::update(float deltaTime) {
 	framerate=1.f/(deltaTime);
 	framerateText.setString(std::to_string((int)ceil(framerate))+" fps");    
+
+    checkUpdate();
 
     //Draw
     viewLeft.setCenter(clamp(gameLogic.players[0].x,LEFT_CENTER_X,BOUND_X1),clamp(gameLogic.players[0].y,BOUND_MIN_Y,BOUND_MAX_Y));

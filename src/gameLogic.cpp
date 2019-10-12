@@ -18,11 +18,20 @@ bool GameLogic::isSolid(int tile,int p_index) {
 	return tile==EMPTY||tile==COIN;
 }
 
-void GameLogic::interact(int indX, int indY) {
-	for(int i=0;i<=1;i++) {
-		cout << map.map[indY][indX] << endl;
+void GameLogic::interact(int p_index,int indX, int indY) {
+	if(map.map[indY][indX]==COIN) {
+		if(players[p_index].coin.timer>0) {
+			map.map[players[p_index].coin.y][players[p_index].coin.x]=COIN;
+			players[p_index].coin.timer=0;
+			players[p_index].coin.collected=true;
+		}
+		players[p_index].coin.x=indX;
+		players[p_index].coin.y=indY;
+		players[p_index].coin.collected=true;
+		map.map[indY][indX]=EMPTY;
+		Modif m={indX,indY,EMPTY};
+		modifs.push_back(m);
 	}
-	interactEvent=false;
 }
 
 //extract map from file
@@ -34,13 +43,27 @@ void GameLogic::extractMap() {
 	filename+=to_string(level)+CSV;
 	levelMap.open(filename.c_str());
 
+	vector<CoinBlock> coinBlocks;
 	if(levelMap.good()) {
 		levelMap >> map.height >> c >> map.width >> c;
+		int sep=map.width>>1;
 		for(int i=0;i<map.height;i++) {
 			vector<int> v;
 			for(int j=0;j<map.width;j++) {
 				levelMap >> tmp >> c;
 				v.push_back(tmp);
+				if(tmp==COIN_BLOCK) {
+					if(j>sep) players[1].coinBlocks.push_back(CoinBlock(i*64.f,j*64.f,10.f,1,0));
+					else players[0].coinBlocks.push_back(CoinBlock(i*64.f,j*64.f,10.f,1,0));
+				} else if(tmp==COIN) {
+					if(j>sep) players[1].coins.push_back(Coin());
+					else players[0].coins.push_back(Coin());
+				} else if(tmp==TIMER_BLOCK) {
+					//read timer
+					timerBlocks.push_back(TimerBlock(i*64.f,j*64.f,10.f,true,1,0));
+				} else if(tmp==COLLAPSE_BLOCK) {
+					collapseBlocks.push_back(CollapseBlock(i*64.f,j*64.f,10.f,1,0));
+				}
 			}
 			map.map.push_back(v);
 		}
@@ -92,7 +115,7 @@ void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,fl
 	int indY=players[p_index].y/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 	sf::FloatRect rect,r=players[p_index].sprite.getGlobalBounds();
 
-	if(interactEvent) interact(indX,indY);
+	if(interactEvent) interact(p_index,indX,indY);
 	if(isSolid(map.map[indY+1][indX],p_index) && players[p_index].state!=2) {
 		players[p_index].state=2;
 		players[p_index].vy=0;
@@ -129,10 +152,34 @@ void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,fl
 		}
 }
 
-void GameLogic::update(float deltaTime,vector<std::vector<sf::Sprite>> &map) {
+void GameLogic::update(float deltaTime,vector<std::vector<sf::Sprite>> &gmap) {
+	modifs.clear();
 	handleEvents(deltaTime);
-	handleCollisions(0,map,deltaTime);
-	handleCollisions(1,map,deltaTime);
+	handleCollisions(0,gmap,deltaTime);
+	handleCollisions(1,gmap,deltaTime);
+	interactEvent = false;
+
+	if(players[0].coin.collected) {
+		players[0].coin.timer+=deltaTime;
+		if(players[0].coin.timer>10.f) {
+			Modif m = {(int)players[0].coin.x,(int)players[0].coin.y,COIN};
+			modifs.push_back(m);
+			map.map[players[0].coin.y][players[0].coin.x]=COIN;
+			players[0].coin.timer=0;
+			players[0].coin.collected=false;
+		}
+	}
+
+	if(players[1].coin.collected) {
+		players[1].coin.timer+=deltaTime;
+		if(players[1].coin.timer>10.f) {
+			Modif m = {(int)players[1].coin.x,(int)players[1].coin.y,COIN};
+			modifs.push_back(m);
+			map.map[players[1].coin.y][players[1].coin.x]=COIN;
+			players[1].coin.timer=0;
+			players[1].coin.collected=false;
+		}
+	}
 
 	players[0].animate(deltaTime);
 	players[1].animate(deltaTime);

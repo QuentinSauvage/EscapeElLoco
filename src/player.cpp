@@ -29,8 +29,8 @@ void Player::animate(float timer) {
 	timerIdle+=timer;
 	timerRun+=timer;
 	if(state==2) {
-		if(vy<-1) spriteRect.left=JUMP_2_OFFSET;
-		else if(vy>1) spriteRect.left=JUMP_1_OFFSET;
+		if(vy<-150) spriteRect.left=JUMP_2_OFFSET;
+		else if(vy>150) spriteRect.left=JUMP_1_OFFSET;
 		else spriteRect.left=JUMP_3_OFFSET;
 		if(vx<0) sprite.setScale(-4.f,4.f);
 		else if(vx>0) sprite.setScale(4.f,4.f);

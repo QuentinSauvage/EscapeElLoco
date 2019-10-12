@@ -15,20 +15,23 @@ class Rope : public Entity {
 		~Rope();
 };
 
-class Coin : public SidedEntity {
+class Coin : public Entity {
 	public:
+		float timer;
+		bool collected;
 		Coin();
+		Coin(float x,float y,float s,float r);
 		~Coin();
 };
 
-class Key : public SidedEntity {
+class Key : public Entity {
 	public:
-		bool displayed;
-		Key(float t);
+		bool collected;
+		Key();
 		~Key();
 };
 
-class Chest : public SidedEntity {
+class Chest : public Entity {
 	public:
 		Chest();
 		~Chest();
