@@ -38,7 +38,7 @@ class GameLogic {
 		GameAudio &gameAudio;
 		int level;
 		float timer;
-		bool pause,interactEvent;
+		bool pause,interactEvent,timerBlocksDisplayed;
 		Map map;
 		std::vector<Modif> modifs;
 		std::vector<TimerBlock> timerBlocks;
@@ -55,6 +55,8 @@ class GameLogic {
 		void testCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		bool isSolid(int tile,int p_index);
 		void interact(int p_index,int indX,int indY);
+		void updateCoin(int p_index,float deltaTime);
+		void updateTimerBlocks(float deltaTime);
 
 		~GameLogic();
 };

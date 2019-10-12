@@ -5,6 +5,7 @@
 
 #define TIMER_COLLAPSE_TIMER 3.0f
 #define TIMER_BLOCK_TIMER 2.0f
+#define COIN_BLOCK_TIMER 10.0f
 
 class Block : public Entity {
 	public:
@@ -34,7 +35,7 @@ class TimerBlock : public Block {
 class CoinBlock : public Block {
 	public:
 		CoinBlock();
-		CoinBlock(float x,float y,float t,float s,float r);
+		CoinBlock(float x,float y,float s,float r);
 		~CoinBlock();
 };
 

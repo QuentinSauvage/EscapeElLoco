@@ -1,8 +1,6 @@
 #ifndef _ENTITY_H_
 #define _ENTITY_H_
 
-#define TIMER_COIN_TIMER 5.0f
-
 class Entity {
 	public:
 		float x,y,scale,rotation;

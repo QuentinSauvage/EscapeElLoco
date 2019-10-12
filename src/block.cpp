@@ -15,5 +15,5 @@ TimerBlock::TimerBlock(float x,float y,float t=TIMER_BLOCK_TIMER,bool d=true,flo
 TimerBlock::~TimerBlock() {}
 
 CoinBlock::CoinBlock() : Block() {}
-CoinBlock::CoinBlock(float x,float y,float t,float s,float r) : Block(x,y,t,s,r) {}
+CoinBlock::CoinBlock(float x,float y,float s,float r) : Block(x,y,0,s,r) {}
 CoinBlock::~CoinBlock() {}

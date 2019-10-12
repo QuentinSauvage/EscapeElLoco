@@ -6,7 +6,7 @@
 
 using namespace std;
 
-GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(1),timer(0),pause(false),interactEvent(false) {
+GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(1),timer(0),pause(false),interactEvent(false),timerBlocksDisplayed(false) {
 	extractMap();
 	players[0].init(POSX1,POSY,PLAYER3_SPRITE);
 	players[1].init(POSX2,POSY,PLAYER4_SPRITE);
@@ -19,18 +19,29 @@ bool GameLogic::isSolid(int tile,int p_index) {
 }
 
 void GameLogic::interact(int p_index,int indX, int indY) {
+	Modif m;
 	if(map.map[indY][indX]==COIN) {
 		if(players[p_index].coin.timer>0) {
 			map.map[players[p_index].coin.y][players[p_index].coin.x]=COIN;
+			m={(int)players[p_index].coin.x,(int)players[p_index].coin.y,EMPTY};
+			modifs.push_back(m);
 			players[p_index].coin.timer=0;
-			players[p_index].coin.collected=true;
 		}
 		players[p_index].coin.x=indX;
 		players[p_index].coin.y=indY;
 		players[p_index].coin.collected=true;
 		map.map[indY][indX]=EMPTY;
-		Modif m={indX,indY,EMPTY};
+		m={indX,indY,EMPTY};
 		modifs.push_back(m);
+		int x,y,other=(p_index+1)%2;
+		size_t size=players[other].coinBlocks.size();
+		for(size_t i=0;i<size;i++) {
+			x=players[other].coinBlocks[i].x;
+			y=players[other].coinBlocks[i].y;
+			map.map[x][y]=EMPTY;
+			m={y,x,EMPTY};
+			modifs.push_back(m);
+		}
 	}
 }
 
@@ -53,16 +64,16 @@ void GameLogic::extractMap() {
 				levelMap >> tmp >> c;
 				v.push_back(tmp);
 				if(tmp==COIN_BLOCK) {
-					if(j>sep) players[1].coinBlocks.push_back(CoinBlock(i*64.f,j*64.f,10.f,1,0));
-					else players[0].coinBlocks.push_back(CoinBlock(i*64.f,j*64.f,10.f,1,0));
+					if(j>sep) players[1].coinBlocks.push_back(CoinBlock(i,j,1,0));
+					else players[0].coinBlocks.push_back(CoinBlock(i,j,1,0));
 				} else if(tmp==COIN) {
 					if(j>sep) players[1].coins.push_back(Coin());
 					else players[0].coins.push_back(Coin());
 				} else if(tmp==TIMER_BLOCK) {
 					//read timer
-					timerBlocks.push_back(TimerBlock(i*64.f,j*64.f,10.f,true,1,0));
+					timerBlocks.push_back(TimerBlock(i,j,TIMER_BLOCK_TIMER,true,1,0));
 				} else if(tmp==COLLAPSE_BLOCK) {
-					collapseBlocks.push_back(CollapseBlock(i*64.f,j*64.f,10.f,1,0));
+					collapseBlocks.push_back(CollapseBlock(i,j,10.f,1,0));
 				}
 			}
 			map.map.push_back(v);
@@ -152,6 +163,45 @@ void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,fl
 		}
 }
 
+void GameLogic::updateCoin(int p_index,float deltaTime) {
+	if(players[p_index].coin.collected) {
+		players[p_index].coin.timer+=deltaTime;
+		if(players[p_index].coin.timer>TIMER_BLOCK_TIMER) {
+			Modif m={(int)players[p_index].coin.x,(int)players[p_index].coin.y,COIN};
+			modifs.push_back(m);
+			map.map[players[p_index].coin.y][players[p_index].coin.x]=COIN;
+			players[p_index].coin.timer=0;
+			players[p_index].coin.collected=false;
+			int x,y,other=(p_index+1)%2;
+			size_t size=players[other].coinBlocks.size();
+			for(size_t i=0;i<size;i++) {
+				x=players[other].coinBlocks[i].x;
+				y=players[other].coinBlocks[i].y;
+				map.map[x][y]=COIN_BLOCK;
+				m={y,x,COIN_BLOCK};
+				modifs.push_back(m);
+			}
+		}
+	}
+}
+
+void GameLogic::updateTimerBlocks(float deltaTime) {
+	timer+=deltaTime;
+	if(timer>TIMER_BLOCK_TIMER) {
+		timer=0;
+		size_t size=timerBlocks.size();
+		int x,y,blockValue=(timerBlocksDisplayed)? EMPTY:TIMER_BLOCK;
+		timerBlocksDisplayed=!timerBlocksDisplayed;
+		for(size_t i=0;i<size;i++) {
+			x=timerBlocks[i].x;
+			y=timerBlocks[i].y;
+			map.map[x][y]=blockValue;
+			Modif m={y,x,blockValue};
+			modifs.push_back(m);
+		}
+	}
+}
+
 void GameLogic::update(float deltaTime,vector<std::vector<sf::Sprite>> &gmap) {
 	modifs.clear();
 	handleEvents(deltaTime);
@@ -159,27 +209,9 @@ void GameLogic::update(float deltaTime,vector<std::vector<sf::Sprite>> &gmap) {
 	handleCollisions(1,gmap,deltaTime);
 	interactEvent = false;
 
-	if(players[0].coin.collected) {
-		players[0].coin.timer+=deltaTime;
-		if(players[0].coin.timer>10.f) {
-			Modif m = {(int)players[0].coin.x,(int)players[0].coin.y,COIN};
-			modifs.push_back(m);
-			map.map[players[0].coin.y][players[0].coin.x]=COIN;
-			players[0].coin.timer=0;
-			players[0].coin.collected=false;
-		}
-	}
-
-	if(players[1].coin.collected) {
-		players[1].coin.timer+=deltaTime;
-		if(players[1].coin.timer>10.f) {
-			Modif m = {(int)players[1].coin.x,(int)players[1].coin.y,COIN};
-			modifs.push_back(m);
-			map.map[players[1].coin.y][players[1].coin.x]=COIN;
-			players[1].coin.timer=0;
-			players[1].coin.collected=false;
-		}
-	}
+	updateCoin(0,deltaTime);
+	updateCoin(1,deltaTime);
+	updateTimerBlocks(deltaTime);
 
 	players[0].animate(deltaTime);
 	players[1].animate(deltaTime);
