@@ -9,7 +9,6 @@
 #include <vector>
 
 #define LOAD_PLAYER_SPRITE_ERROR "Error when loading character sprite"
-#define DEFAULT_MAX_LIFE 3
 #define DEFAULT_SPEED 300.0f
 #define PLAYER_DIM 16
 #define RUN_1_OFFSET 414
@@ -25,7 +24,7 @@
 
 class Player : public Entity {
 	public:
-		int life,maxLife,state;
+		int state;
 		float speed,vx,vy,timerIdle,timerRun;
 		bool coinTaken;
 		sf::Sprite sprite;

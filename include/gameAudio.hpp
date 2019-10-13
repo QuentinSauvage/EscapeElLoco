@@ -4,16 +4,18 @@
 #include <SFML/Audio.hpp>
 
 #define LOAD_MUSIC_ERROR "Error when loading music"
+#define LOAD_TIMER_ERROR "Error when loading timer sound"
 #define LOAD_JUMP_ERROR "Error when loading jump sound"
 #define JUMP_AUDIO_PATH "audio/jump.wav"
 #define MUSIC_PATH "audio/music.wav"
-#define VOLUME 30
+#define TIMER_PATH "audio/timer.wav"
+#define VOLUME 20
 
 class GameAudio {
 	public:
         sf::Music music;
-        sf::SoundBuffer jumpAudio;
-		sf::Sound jumpSoundLeft,jumpSoundRight;
+        sf::SoundBuffer jumpAudio, timerAudio;
+		sf::Sound jumpSoundLeft,jumpSoundRight, timer;
         bool playing;
 
 		GameAudio();

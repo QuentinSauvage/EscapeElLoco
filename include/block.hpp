@@ -5,7 +5,7 @@
 
 #define TIMER_COLLAPSE_TIMER 3.0f
 #define TIMER_BLOCK_TIMER 2.0f
-#define COIN_BLOCK_TIMER 10.0f
+#define COIN_BLOCK_TIMER 7.0f
 
 class Block : public Entity {
 	public:

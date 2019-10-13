@@ -27,6 +27,7 @@ void GameLogic::interact(int p_index,int indX, int indY) {
 			modifs.push_back(m);
 			players[p_index].coin.timer=0;
 		}
+		gameAudio.timer.play();
 		players[p_index].coin.x=indX;
 		players[p_index].coin.y=indY;
 		players[p_index].coin.collected=true;
@@ -107,6 +108,12 @@ void GameLogic::handleEvents(float deltaTime) {
 				if(gameAudio.playing) gameAudio.jumpSoundRight.play();
 			}
 		}
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
+			players[0].x=POSX1;
+			players[1].x=POSX2;
+			players[0].y=players[1].y=POSY;
+			players[0].state=players[1].state=0;
+		}
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)) gameAudio.changeState();
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) interactEvent = true;
 	}
@@ -166,7 +173,7 @@ void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,fl
 void GameLogic::updateCoin(int p_index,float deltaTime) {
 	if(players[p_index].coin.collected) {
 		players[p_index].coin.timer+=deltaTime;
-		if(players[p_index].coin.timer>TIMER_BLOCK_TIMER) {
+		if(players[p_index].coin.timer>COIN_BLOCK_TIMER) {
 			Modif m={(int)players[p_index].coin.x,(int)players[p_index].coin.y,COIN};
 			modifs.push_back(m);
 			map.map[players[p_index].coin.y][players[p_index].coin.x]=COIN;
