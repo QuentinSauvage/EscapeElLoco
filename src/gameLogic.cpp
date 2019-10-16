@@ -12,13 +12,15 @@ GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(1),timer(0),paus
 	players[1].init(POSX2,POSY,PLAYER4_SPRITE);
 }
 
-bool GameLogic::isSolid(int tile,int p_index) {
-	if(players[p_index].coinTaken)
-		return false;
+bool GameLogic::isFalling(int tile,int p_index) {
 	return tile==EMPTY||tile==COIN;
 }
 
-void GameLogic::interact(int p_index,int indX, int indY) {
+bool GameLogic::isSolid(int tile,int p_index) {
+	return tile!=EMPTY&&tile!=COIN&&tile!=LADDER;
+}
+
+void GameLogic::interact(int p_index,int indX, int indY,float deltaTime) {
 	Modif m;
 	if(map.map[indY][indX]==COIN) {
 		if(players[p_index].coin.timer>0) {
@@ -43,6 +45,8 @@ void GameLogic::interact(int p_index,int indX, int indY) {
 			m={y,x,EMPTY};
 			modifs.push_back(m);
 		}
+	} else if(map.map[indY][indX]==LADDER||map.map[indY+1][indX]==LADDER) {
+		players[p_index].y-=players[p_index].speed*deltaTime;
 	}
 }
 
@@ -71,7 +75,6 @@ void GameLogic::extractMap() {
 					if(j>sep) players[1].coins.push_back(Coin());
 					else players[0].coins.push_back(Coin());
 				} else if(tmp==TIMER_BLOCK) {
-					//read timer
 					timerBlocks.push_back(TimerBlock(i,j,TIMER_BLOCK_TIMER,true,1,0));
 				} else if(tmp==COLLAPSE_BLOCK) {
 					collapseBlocks.push_back(CollapseBlock(i,j,10.f,1,0));
@@ -128,27 +131,44 @@ void GameLogic::jump(int p_index,vector<vector<sf::Sprite>> &gmap,float deltaTim
 }
 
 void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,float deltaTime) {
-	jump(p_index,gmap,deltaTime);
 	float xp,xn,yp,yn;
 	int indY=players[p_index].y/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 	sf::FloatRect rect,r=players[p_index].sprite.getGlobalBounds();
 
-	if(interactEvent) interact(p_index,indX,indY);
-	if(isSolid(map.map[indY+1][indX],p_index) && players[p_index].state!=2) {
-		players[p_index].state=2;
-		players[p_index].vy=0;
+	if(interactEvent) interact(p_index,indX,indY,deltaTime);
+	if(!isSolid(map.map[indY+1][indX],p_index) && players[p_index].state!=2) {
+		if(isFalling(map.map[indY+1][indX],p_index))
+			players[p_index].state=2;
+		else {cout<<"ladder" << endl;players[p_index].state=0;players[p_index].vy=0;}
 	}
 
-	if(players[p_index].vy>0) {
-		yn = indY;
-		yp = (indY+4>map.height)? map.height : indY+4;
-	} else if(players[p_index].vy<0) {
-		yn=(indY-4<0)? 0 : indY-4;
-		yp=indY+1;
-	} else yn=yp=0;
+	if(players[p_index].vx>=0) {
+		xp=(indX+2>map.width)? map.width : indX+2;
+		xn=indX;
+	} else {
+		xp=indX;
+		xn=(indX-2<0)? 0 : indX-2;
+	}
+	for(;xn<xp;xn++)
+		if(isSolid(map.map[indY][xn],p_index) && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][xn].getGlobalBounds(),rect))) {
+			if(rect.left>r.left) players[p_index].x-=rect.width;
+			else players[p_index].x+=rect.width;
+			players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
+			break;
+		}
 
+	jump(p_index,gmap,deltaTime);
+
+	indY=players[p_index].y/TILE_DIM,indX=players[p_index].x/TILE_DIM;
+	if(players[p_index].vy>=0) {
+		yn=(indY-2<0)? 0 : indY-2;
+		yp=indY+1;
+	} else {
+		yn = indY;
+		yp = (indY+2>map.height)? map.height : indY+2;
+	}
 	for(;yn<yp;yn++)
-		if(!isSolid(map.map[yn][indX],p_index) && (players[p_index].sprite.getGlobalBounds().intersects(gmap[yn][indX].getGlobalBounds(),rect))) {
+		if(isSolid(map.map[yn][indX],p_index) && (players[p_index].sprite.getGlobalBounds().intersects(gmap[yn][indX].getGlobalBounds(),rect))) {
 			if(rect.top>r.top) {
 				players[p_index].y-=rect.height;
 				players[p_index].state=(players[p_index].vx!=0)? 1 : 0;
@@ -157,16 +177,6 @@ void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,fl
 			players[p_index].vy=0;
 			players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
 			r = players[p_index].sprite.getGlobalBounds();
-			break;
-		}
-	xn=(indX-4<0)? 0 : indX-4;
-	xp=(indX+4>map.width)? map.width : indX+4;
-	for(;xn<xp;xn++)
-		if(!isSolid(map.map[indY][xn],p_index) && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][xn].getGlobalBounds(),rect))) {
-			if(rect.left>r.left) players[p_index].x-=rect.width;
-			else players[p_index].x+=rect.width;
-			players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
-			break;
 		}
 }
 

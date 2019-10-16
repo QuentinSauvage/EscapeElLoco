@@ -23,6 +23,7 @@
 #define COIN_BLOCK 25
 #define TIMER_BLOCK 12
 #define COLLAPSE_BLOCK 66
+#define LADDER 56
 #define PLAYER3_SPRITE "sprites/dino/3.png"
 #define PLAYER4_SPRITE "sprites/dino/4.png"
 
@@ -54,7 +55,8 @@ class GameLogic {
 		void update(float deltaTime,std::vector<std::vector<sf::Sprite>> &gmap);
 		void testCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		bool isSolid(int tile,int p_index);
-		void interact(int p_index,int indX,int indY);
+		bool isFalling(int tile,int p_index);
+		void interact(int p_index,int indX,int indY,float deltaTime);
 		void updateCoin(int p_index,float deltaTime);
 		void updateTimerBlocks(float deltaTime);
 
