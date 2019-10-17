@@ -18,12 +18,15 @@
 #define GRAVITY 2500
 #define PLAYER_DIM_SCALED 32
 #define TILE_DIM 64
+#define OFFSET 32
 #define EMPTY 98
 #define COIN 65
 #define COIN_BLOCK 25
 #define TIMER_BLOCK 12
 #define COLLAPSE_BLOCK 66
 #define LADDER 56
+#define ROPE 15
+#define ROPE_END 23
 #define PLAYER3_SPRITE "sprites/dino/3.png"
 #define PLAYER4_SPRITE "sprites/dino/4.png"
 

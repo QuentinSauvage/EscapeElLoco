@@ -17,7 +17,7 @@ bool GameLogic::isFalling(int tile,int p_index) {
 }
 
 bool GameLogic::isSolid(int tile,int p_index) {
-	return tile!=EMPTY&&tile!=COIN&&tile!=LADDER;
+	return tile!=EMPTY&&tile!=COIN&&tile!=LADDER&&tile!=ROPE&&tile!=ROPE_END;
 }
 
 void GameLogic::interact(int p_index,int indX, int indY,float deltaTime) {
@@ -45,7 +45,9 @@ void GameLogic::interact(int p_index,int indX, int indY,float deltaTime) {
 			m={y,x,EMPTY};
 			modifs.push_back(m);
 		}
-	} else if(map.map[indY][indX]==LADDER||map.map[indY+1][indX]==LADDER) {
+	} else if(map.map[indY][indX]==LADDER||map.map[indY+1][indX]==LADDER||map.map[indY][indX]==ROPE||map.map[indY+1][indX]==ROPE||map.map[indY][indX]==ROPE_END||map.map[indY+1][indX]==ROPE_END) {
+		players[p_index].vy=0;
+		players[p_index].state=2;
 		if(climbing) players[p_index].y-=players[p_index].speed*deltaTime;
 		else players[p_index].y+=players[p_index].speed*deltaTime;
 	}
@@ -139,7 +141,7 @@ void GameLogic::jump(int p_index,vector<vector<sf::Sprite>> &gmap,float deltaTim
 
 void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,float deltaTime) {
 	float xp,xn,yp,yn;
-	int indY=(players[p_index].y-32)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
+	int indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 	sf::FloatRect rect,r=players[p_index].sprite.getGlobalBounds();
 
 	if(interactEvent) interact(p_index,indX,indY,deltaTime);
