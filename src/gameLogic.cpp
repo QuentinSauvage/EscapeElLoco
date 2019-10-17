@@ -12,15 +12,15 @@ GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(1),timer(0),paus
 	players[1].init(POSX2,POSY,PLAYER4_SPRITE);
 }
 
-bool GameLogic::isFalling(int tile,int p_index) {
+bool GameLogic::isFalling(int tile) {
 	return tile==EMPTY||tile==COIN;
 }
 
-bool GameLogic::isSolid(int tile,int p_index) {
+bool GameLogic::isSolid(int tile) {
 	return tile!=EMPTY&&tile!=COIN&&tile!=LADDER&&tile!=ROPE&&tile!=ROPE_END;
 }
 
-void GameLogic::interact(int p_index,int indX, int indY,float deltaTime) {
+void GameLogic::interact(int p_index,int &indX, int &indY,float deltaTime) {
 	Modif m;
 	if(map.map[indY][indX]==COIN) {
 		if(players[p_index].coin.timer>0) {
@@ -48,8 +48,13 @@ void GameLogic::interact(int p_index,int indX, int indY,float deltaTime) {
 	} else if(map.map[indY][indX]==LADDER||map.map[indY+1][indX]==LADDER||map.map[indY][indX]==ROPE||map.map[indY+1][indX]==ROPE||map.map[indY][indX]==ROPE_END||map.map[indY+1][indX]==ROPE_END) {
 		players[p_index].vy=0;
 		players[p_index].state=2;
+		float tmp=players[p_index].y;
+
 		if(climbing) players[p_index].y-=players[p_index].speed*deltaTime;
 		else players[p_index].y+=players[p_index].speed*deltaTime;
+		int y=(players[p_index].y-OFFSET)/TILE_DIM;
+		if(isSolid(map.map[y][indX])) players[p_index].y=tmp;
+		else indY=y;
 	}
 }
 
@@ -145,8 +150,8 @@ void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,fl
 	sf::FloatRect rect,r=players[p_index].sprite.getGlobalBounds();
 
 	if(interactEvent) interact(p_index,indX,indY,deltaTime);
-	if(!isSolid(map.map[indY+1][indX],p_index) && players[p_index].state!=2) {
-		if(isFalling(map.map[indY+1][indX],p_index))
+	if(!isSolid(map.map[indY+1][indX]) && players[p_index].state!=2) {
+		if(isFalling(map.map[indY+1][indX]))
 			players[p_index].state=2;
 		else {players[p_index].state=0;players[p_index].vy=0;}
 	}
@@ -160,7 +165,7 @@ void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,fl
 	}
 
 	for(;xn<xp;xn++)
-		if(isSolid(map.map[indY][xn],p_index) && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][xn].getGlobalBounds(),rect))) {
+		if(isSolid(map.map[indY][xn]) && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][xn].getGlobalBounds(),rect))) {
 			if(rect.left>r.left) players[p_index].x-=rect.width;
 			else players[p_index].x+=rect.width;
 			players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
@@ -178,7 +183,7 @@ void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,fl
 		yp = (indY+2>map.height)? map.height : indY+2;
 	}
 	for(;yn<yp;yn++)
-		if(isSolid(map.map[yn][indX],p_index) && (players[p_index].sprite.getGlobalBounds().intersects(gmap[yn][indX].getGlobalBounds(),rect))) {
+		if(isSolid(map.map[yn][indX]) && (players[p_index].sprite.getGlobalBounds().intersects(gmap[yn][indX].getGlobalBounds(),rect))) {
 			if(rect.top>=r.top) {
 				players[p_index].y-=rect.height;
 				players[p_index].state=(players[p_index].vx!=0)? 1 : 0;

@@ -57,9 +57,9 @@ class GameLogic {
 		void handleCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		void update(float deltaTime,std::vector<std::vector<sf::Sprite>> &gmap);
 		void testCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
-		bool isSolid(int tile,int p_index);
-		bool isFalling(int tile,int p_index);
-		void interact(int p_index,int indX,int indY,float deltaTime);
+		bool isSolid(int tile);
+		bool isFalling(int tile);
+		void interact(int p_index,int &indX,int &indY,float deltaTime);
 		void updateCoin(int p_index,float deltaTime);
 		void updateTimerBlocks(float deltaTime);
 
