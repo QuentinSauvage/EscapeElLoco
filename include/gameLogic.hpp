@@ -39,7 +39,7 @@ class GameLogic {
 		GameAudio &gameAudio;
 		int level;
 		float timer;
-		bool pause,interactEvent,timerBlocksDisplayed;
+		bool pause,interactEvent,timerBlocksDisplayed,climbing;
 		Map map;
 		std::vector<Modif> modifs;
 		std::vector<TimerBlock> timerBlocks;

@@ -46,7 +46,8 @@ void GameLogic::interact(int p_index,int indX, int indY,float deltaTime) {
 			modifs.push_back(m);
 		}
 	} else if(map.map[indY][indX]==LADDER||map.map[indY+1][indX]==LADDER) {
-		players[p_index].y-=players[p_index].speed*deltaTime;
+		if(climbing) players[p_index].y-=players[p_index].speed*deltaTime;
+		else players[p_index].y+=players[p_index].speed*deltaTime;
 	}
 }
 
@@ -118,7 +119,13 @@ void GameLogic::handleEvents(float deltaTime) {
 			players[0].state=players[1].state=0;
 		}
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)) gameAudio.changeState();
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) interactEvent = true;
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+			climbing=true;
+			interactEvent = true;
+		} else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+			climbing=false;
+			interactEvent = true;
+		}
 	}
 }
 
@@ -129,7 +136,7 @@ void GameLogic::jump(int p_index,vector<vector<sf::Sprite>> &gmap,float deltaTim
 		players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
     }
 }
-
+int i=0;
 void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,float deltaTime) {
 	float xp,xn,yp,yn;
 	int indY=players[p_index].y/TILE_DIM,indX=players[p_index].x/TILE_DIM;
@@ -139,16 +146,21 @@ void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,fl
 	if(!isSolid(map.map[indY+1][indX],p_index) && players[p_index].state!=2) {
 		if(isFalling(map.map[indY+1][indX],p_index))
 			players[p_index].state=2;
-		else {cout<<"ladder" << endl;players[p_index].state=0;players[p_index].vy=0;}
+		else {players[p_index].state=0;players[p_index].vy=0;}
 	}
-
-	if(players[p_index].vx>=0) {
+	
+	if(players[p_index].vx>0) {
 		xp=(indX+2>map.width)? map.width : indX+2;
 		xn=indX;
 	} else {
 		xp=indX;
 		xn=(indX-2<0)? 0 : indX-2;
 	}
+
+	if(isSolid(map.map[indY+1][indX],p_index) && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY+1][indX].getGlobalBounds(),rect))) {
+			players[p_index].y-=rect.height;
+	}
+
 	for(;xn<xp;xn++)
 		if(isSolid(map.map[indY][xn],p_index) && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][xn].getGlobalBounds(),rect))) {
 			if(rect.left>r.left) players[p_index].x-=rect.width;
