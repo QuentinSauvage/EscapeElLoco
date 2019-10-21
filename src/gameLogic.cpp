@@ -29,7 +29,7 @@ void GameLogic::interact(int p_index,int &indX, int &indY,float deltaTime) {
 			modifs.push_back(m);
 			players[p_index].coin.timer=0;
 		}
-		gameAudio.timer.play();
+		if(gameAudio.playing) gameAudio.timer.play();
 		players[p_index].coin.x=indX;
 		players[p_index].coin.y=indY;
 		players[p_index].coin.collected=true;
@@ -195,7 +195,37 @@ void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,fl
 		}
 }
 
-void GameLogic::updateCoin(int p_index,float deltaTime) {
+void GameLogic::handleCollisions2(int p_index,vector<vector<sf::Sprite>> &gmap) {
+	int indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
+	sf::FloatRect rect,r=players[p_index].sprite.getGlobalBounds();
+	if(isSolid(map.map[indY][indX]) && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][indX].getGlobalBounds(),rect))) {
+		for(int i=0,j=0;i<5&&j<5;++i,++j) {
+			if(!isSolid(map.map[indY][indX-j])) {
+				if(rect.left>r.left) players[p_index].x-=rect.width;
+				else players[p_index].x+=rect.width;
+				break;
+			}
+			if(!isSolid(map.map[indY][indX+j])) {
+				if(rect.left>r.left) players[p_index].x-=rect.width;
+				else players[p_index].x+=rect.width;
+				break;
+			}
+			if(!isSolid(map.map[indY-i][indX])) {
+				if(rect.left>r.left) players[p_index].y-=rect.height;
+				else players[p_index].y+=rect.height;
+				break;
+			}
+			if(!isSolid(map.map[indY-i][indX])) {
+				if(rect.left>r.left) players[p_index].y-=rect.height;
+				else players[p_index].y+=rect.height;
+				break;
+			}
+		}
+		players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
+	}
+}
+
+bool GameLogic::updateCoin(int p_index,float deltaTime) {
 	if(players[p_index].coin.collected) {
 		players[p_index].coin.timer+=deltaTime;
 		if(players[p_index].coin.timer>COIN_BLOCK_TIMER) {
@@ -213,11 +243,13 @@ void GameLogic::updateCoin(int p_index,float deltaTime) {
 				m={y,x,COIN_BLOCK};
 				modifs.push_back(m);
 			}
+			return true;
 		}
 	}
+	return false;
 }
 
-void GameLogic::updateTimerBlocks(float deltaTime) {
+bool GameLogic::updateTimerBlocks(float deltaTime) {
 	timer+=deltaTime;
 	if(timer>TIMER_BLOCK_TIMER) {
 		timer=0;
@@ -231,7 +263,9 @@ void GameLogic::updateTimerBlocks(float deltaTime) {
 			Modif m={y,x,blockValue};
 			modifs.push_back(m);
 		}
+		return true;
 	}
+	return false;
 }
 
 void GameLogic::update(float deltaTime,vector<std::vector<sf::Sprite>> &gmap) {
@@ -241,9 +275,15 @@ void GameLogic::update(float deltaTime,vector<std::vector<sf::Sprite>> &gmap) {
 	handleCollisions(1,gmap,deltaTime);
 	interactEvent = false;
 
-	updateCoin(0,deltaTime);
-	updateCoin(1,deltaTime);
-	updateTimerBlocks(deltaTime);
+	bool reappear1=false,reappear2=false;
+	if(updateCoin(0,deltaTime))
+		reappear2=true;
+	if(updateCoin(1,deltaTime))
+		reappear1=true;
+	if(updateTimerBlocks(deltaTime))
+		reappear1=reappear2=true;
+	if(reappear1) handleCollisions2(0,gmap);
+	if(reappear2) handleCollisions2(1,gmap);
 
 	players[0].animate(deltaTime);
 	players[1].animate(deltaTime);

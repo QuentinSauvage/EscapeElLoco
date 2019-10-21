@@ -55,13 +55,15 @@ class GameLogic {
 		void handleEvents(float deltaTime);
 		void jump(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		void handleCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
+		//check if player is on a block that just reappeared, if so, move it on the closest empty tile
+		void handleCollisions2(int p_index,std::vector<std::vector<sf::Sprite>> &gmap);
 		void update(float deltaTime,std::vector<std::vector<sf::Sprite>> &gmap);
 		void testCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		bool isSolid(int tile);
 		bool isFalling(int tile);
 		void interact(int p_index,int &indX,int &indY,float deltaTime);
-		void updateCoin(int p_index,float deltaTime);
-		void updateTimerBlocks(float deltaTime);
+		bool updateCoin(int p_index,float deltaTime);
+		bool updateTimerBlocks(float deltaTime);
 
 		~GameLogic();
 };
