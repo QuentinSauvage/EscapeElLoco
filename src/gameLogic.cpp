@@ -146,7 +146,7 @@ void GameLogic::jump(int p_index,vector<vector<sf::Sprite>> &gmap,float deltaTim
 
 void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,float deltaTime) {
 	float xp,xn,yp,yn;
-	int indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
+	int indY=players[p_index].y/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 	sf::FloatRect rect,r=players[p_index].sprite.getGlobalBounds();
 
 	if(interactEvent) interact(p_index,indX,indY,deltaTime);

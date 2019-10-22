@@ -101,7 +101,7 @@ float clamp(float v,float min,float max) {
 void GameGraphics::update(float deltaTime) {
 	framerate=1.f/(deltaTime);
 	framerateText.setString(std::to_string((int)ceil(framerate))+" fps");    
-
+    
     checkUpdate();
 
     //Draw

@@ -14,7 +14,7 @@
 #define PATH_LEVEL "levels/level"
 #define CSV ".csv"
 #define LOAD_MAP_ERROR "Error while reading map\n"
-#define JUMP_VELOCITY 1000
+#define JUMP_VELOCITY 900
 #define GRAVITY 2500
 #define PLAYER_DIM_SCALED 32
 #define TILE_DIM 64

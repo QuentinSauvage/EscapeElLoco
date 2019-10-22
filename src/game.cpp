@@ -22,6 +22,7 @@ void Game::run() {
             else if(event.type==Event::LostFocus) gameLogic.pause=true;
             else if(event.type==Event::GainedFocus) gameLogic.pause=false;
         }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) break;
         gameLogic.update(deltaTime,gameGraphics.map);
         gameGraphics.update(deltaTime);
         
