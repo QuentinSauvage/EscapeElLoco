@@ -211,18 +211,24 @@ void GameLogic::handleCollisions2(int p_index,vector<vector<sf::Sprite>> &gmap) 
 				break;
 			}
 			if(!isSolid(map.map[indY-i][indX])) {
-				if(rect.left>r.left) players[p_index].y-=rect.height;
+				if(rect.top>r.top) players[p_index].y-=rect.height;
 				else players[p_index].y+=rect.height;
 				break;
 			}
 			if(!isSolid(map.map[indY-i][indX])) {
-				if(rect.left>r.left) players[p_index].y-=rect.height;
+				if(rect.top>r.top) players[p_index].y-=rect.height;
 				else players[p_index].y+=rect.height;
 				break;
 			}
 		}
 		players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
 	}
+	//needs fix: reappearing on rope => not falling
+	/*if(!isSolid(map.map[indY+1][indX]) && players[p_index].state!=2) {
+		if(isFalling(map.map[indY+1][indX]))
+			players[p_index].state=2;
+		else {players[p_index].state=0;players[p_index].vy=0;}
+	}*/
 }
 
 bool GameLogic::updateCoin(int p_index,float deltaTime) {
