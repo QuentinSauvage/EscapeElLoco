@@ -56,7 +56,7 @@ class GameLogic {
 		void jump(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		void handleCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		//check if player is on a block that just reappeared, if so, move it on the closest empty tile
-		void handleCollisions2(int p_index,std::vector<std::vector<sf::Sprite>> &gmap);
+		void handleCollisions2(int p_index,std::vector<std::vector<sf::Sprite>> &gmap, float dt);
 		void update(float deltaTime,std::vector<std::vector<sf::Sprite>> &gmap);
 		void testCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		bool isSolid(int tile);

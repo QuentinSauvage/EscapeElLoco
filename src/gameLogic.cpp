@@ -146,6 +146,7 @@ void GameLogic::jump(int p_index,vector<vector<sf::Sprite>> &gmap,float deltaTim
 
 void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,float deltaTime) {
 	float xp,xn,yp,yn;
+	if(!p_index) cout << players[0].state << endl;
 	int indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 	sf::FloatRect rect,r=players[p_index].sprite.getGlobalBounds();
 
@@ -195,17 +196,17 @@ void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,fl
 		}
 }
 
-void GameLogic::handleCollisions2(int p_index,vector<vector<sf::Sprite>> &gmap) {
+void GameLogic::handleCollisions2(int p_index,vector<vector<sf::Sprite>> &gmap, float deltaTime) {
 	int indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 	sf::FloatRect rect,r=players[p_index].sprite.getGlobalBounds();
 	if(isSolid(map.map[indY][indX]) && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][indX].getGlobalBounds(),rect))) {
-		for(int i=0,j=0;i<5&&j<5;++i,++j) {
-			if(!isSolid(map.map[indY][indX-j])) {
+		for(int i=0;i<5;++i) {
+			if(!isSolid(map.map[indY][indX-i])) {
 				if(rect.left>r.left) players[p_index].x-=rect.width;
 				else players[p_index].x+=rect.width;
 				break;
 			}
-			if(!isSolid(map.map[indY][indX+j])) {
+			if(!isSolid(map.map[indY][indX+i])) {
 				if(rect.left>r.left) players[p_index].x-=rect.width;
 				else players[p_index].x+=rect.width;
 				break;
@@ -221,14 +222,16 @@ void GameLogic::handleCollisions2(int p_index,vector<vector<sf::Sprite>> &gmap) 
 				break;
 			}
 		}
+		indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 		players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
+		if(!isSolid(map.map[indY+1][indX])) {
+				players[p_index].vy=0;
+				players[p_index].state=2;
+				float tmp=players[p_index].y;
+				players[p_index].y+=players[p_index].speed*deltaTime;
+				int y=(players[p_index].y-OFFSET)/TILE_DIM;
+		}
 	}
-	//needs fix: reappearing on rope => not falling
-	/*if(!isSolid(map.map[indY+1][indX]) && players[p_index].state!=2) {
-		if(isFalling(map.map[indY+1][indX]))
-			players[p_index].state=2;
-		else {players[p_index].state=0;players[p_index].vy=0;}
-	}*/
 }
 
 bool GameLogic::updateCoin(int p_index,float deltaTime) {
@@ -282,14 +285,11 @@ void GameLogic::update(float deltaTime,vector<std::vector<sf::Sprite>> &gmap) {
 	interactEvent = false;
 
 	bool reappear1=false,reappear2=false;
-	if(updateCoin(0,deltaTime))
-		reappear2=true;
-	if(updateCoin(1,deltaTime))
-		reappear1=true;
-	if(updateTimerBlocks(deltaTime))
-		reappear1=reappear2=true;
-	if(reappear1) handleCollisions2(0,gmap);
-	if(reappear2) handleCollisions2(1,gmap);
+	if(updateCoin(0,deltaTime)) reappear2=true;
+	if(updateCoin(1,deltaTime)) reappear1=true;
+	if(updateTimerBlocks(deltaTime)) reappear1=reappear2=true;
+	if(reappear1) handleCollisions2(0,gmap,deltaTime);
+	if(reappear2) handleCollisions2(1,gmap,deltaTime);
 
 	players[0].animate(deltaTime);
 	players[1].animate(deltaTime);
