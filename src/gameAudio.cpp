@@ -16,7 +16,10 @@ void GameAudio::load() {
     jumpSoundLeft.setPosition(-1.0f,0.0f,0.0f);
     jumpSoundRight.setPosition(1.0f,0.0f,0.0f);
     if(!timerAudio.loadFromFile(TIMER_PATH)) std::cerr << LOAD_TIMER_ERROR << std::endl;
-    else timer.setBuffer(timerAudio);
+    else {
+        timer.setBuffer(timerAudio);
+        timer.setVolume(200);
+    }
 }
 
 void GameAudio::changeState() {
