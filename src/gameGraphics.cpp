@@ -59,8 +59,9 @@ void GameGraphics::drawBackground(int k) {
         end=screenLimit;
     }
     for(int i=0;i<gameLogic.map.height;i++)
-        for(int j=begin;j<end;j++)
+        for(int j=begin;j<end;j++) {
             window.draw(map[i][j]);
+        }
 }
 
 void GameGraphics::buildWindow() {

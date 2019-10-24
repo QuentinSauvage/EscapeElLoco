@@ -27,6 +27,11 @@
 #define LADDER 56
 #define ROPE 15
 #define ROPE_END 23
+#define CHEST_L 30
+#define CHEST_R 31
+#define KEY 90
+#define DOOR_T 74
+#define DOOR_B 82
 #define PLAYER3_SPRITE "sprites/dino/3.png"
 #define PLAYER4_SPRITE "sprites/dino/4.png"
 
@@ -35,6 +40,7 @@ class GameLogic {
 		struct Map {
 			int height,width;
 			std::vector<std::vector<int>> map;
+			std::vector<std::vector<bool>> collisions;
 		};
 		struct Modif {
 			int x,y,value;
