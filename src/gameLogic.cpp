@@ -203,23 +203,25 @@ void GameLogic::handleCollisions2(int p_index,vector<vector<sf::Sprite>> &gmap, 
 	int indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 	sf::FloatRect rect;
 	if(map.collisions[indY][indX] && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][indX].getGlobalBounds(),rect))) {
-		for(int i=1;i<5;++i) {//bug à corriger : checker bords du jeu
-			if(!map.collisions[indY][indX-i]) {
+		int i=1;
+		while(true) {
+			if(indX-i&&!map.collisions[indY][indX-i]) {
 				players[p_index].x-=rect.width;
 				break;
 			}
-			if(!map.collisions[indY][indX+i]) {
+			if(indX+i<map.width&&!map.collisions[indY][indX+i]) {
 				players[p_index].x+=rect.width;
 				break;
 			}
-			if(!map.collisions[indY-i][indX]) {
+			if(indY-i&&!map.collisions[indY-i][indX]) {
 				players[p_index].y+=rect.height;
 				break;
 			}
-			if(!map.collisions[indY+i][indX]) {
+			if(indY+i<map.height&&!map.collisions[indY+i][indX]) {
 				players[p_index].y-=rect.height;
 				break;
 			}
+			++i;
 		}
 		indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 		players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
