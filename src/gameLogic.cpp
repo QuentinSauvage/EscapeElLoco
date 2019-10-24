@@ -16,10 +16,12 @@ bool GameLogic::isFalling(int tile) {
 	return tile==EMPTY||tile==COIN;
 }
 
+//to-do:blocs qui tombent, coffre/clés=>porte déverouillées (changement de niveau)
+
 int GameLogic::tileType(int tile) {
-	if(tile==EMPTY||tile==COIN) return -1;
-	return tile!=LADDER&&tile!=ROPE&&tile!=ROPE_END
-	&&tile!=DOOR_B&&tile!=DOOR_T&&tile!=KEY&&tile!=CHEST_L&&tile!=CHEST_R;
+	if(tile==EMPTY||tile==COIN||tile==CHAIR_L||tile==CHAIR_R||tile==BOUQUET||
+	tile==DOOR_B||tile==DOOR_T||tile==KEY||tile==CHEST_L||tile==CHEST_R) return -1;
+	return tile!=LADDER&&tile!=ROPE&&tile!=ROPE_TOP&&tile!=ROPE_END;
 }
 
 void GameLogic::interact(int &indX, int &indY,float deltaTime) {

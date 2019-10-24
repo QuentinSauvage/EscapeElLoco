@@ -32,8 +32,16 @@ void GameGraphics::load() {
         for(int j=0; j<gameLogic.map.width;j++) {
             s.setTexture(background);
             int tileNumber=gameLogic.map.map[i][j];
-            s.setTextureRect(IntRect((tileNumber%8)<<4,(tileNumber>>3)<<4,16,16));
-            s.setPosition(j<<6,i<<6);
+            if(tileNumber==TABLE) {
+                s.setTextureRect(IntRect((tileNumber%8)<<4,((tileNumber>>3)<<4)+8,16,8));
+                s.setPosition(j<<6,(i<<6)+32);
+            } else {
+                if(tileNumber==COLLAPSE_BLOCK)
+                    s.setTextureRect(IntRect((tileNumber%8)<<4,(tileNumber>>3)<<4,16,8));
+                else
+                    s.setTextureRect(IntRect((tileNumber%8)<<4,(tileNumber>>3)<<4,16,16));
+                s.setPosition(j<<6,i<<6);
+            }
             s.setScale(4.f,4.f);
             v.push_back(s);
         }
