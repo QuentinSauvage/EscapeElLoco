@@ -6,7 +6,7 @@
 
 using namespace std;
 
-GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(1),timer(0),pause(false),interactEvent(false),timerBlocksDisplayed(false) {
+GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(1),p_index(0),timer(0),pause(false),interactEvent(false),timerBlocksDisplayed(false) {
 	extractMap();
 	players[0].init(POSX1,POSY,PLAYER3_SPRITE);
 	players[1].init(POSX2,POSY,PLAYER4_SPRITE);
@@ -16,12 +16,13 @@ bool GameLogic::isFalling(int tile) {
 	return tile==EMPTY||tile==COIN;
 }
 
-bool GameLogic::isSolid(int tile) {
-	return tile!=EMPTY&&tile!=COIN&&tile!=LADDER&&tile!=ROPE&&tile!=ROPE_END
+int GameLogic::tileType(int tile) {
+	if(tile==EMPTY||tile==COIN) return -1;
+	return tile!=LADDER&&tile!=ROPE&&tile!=ROPE_END
 	&&tile!=DOOR_B&&tile!=DOOR_T&&tile!=KEY&&tile!=CHEST_L&&tile!=CHEST_R;
 }
 
-void GameLogic::interact(int p_index,int &indX, int &indY,float deltaTime) {
+void GameLogic::interact(int &indX, int &indY,float deltaTime) {
 	Modif m;
 	if(map.map[indY][indX]==COIN) {
 		if(players[p_index].coin.timer>0) {
@@ -43,7 +44,7 @@ void GameLogic::interact(int p_index,int &indX, int &indY,float deltaTime) {
 			x=players[other].coinBlocks[i].x;
 			y=players[other].coinBlocks[i].y;
 			map.map[x][y]=EMPTY;
-			map.collisions[x][y]=false;
+			map.collisions[x][y]=-1;
 			m={y,x,EMPTY};
 			modifs.push_back(m);
 		}
@@ -56,7 +57,7 @@ void GameLogic::interact(int p_index,int &indX, int &indY,float deltaTime) {
 		if(climbing) players[p_index].y-=players[p_index].speed*deltaTime;
 		else players[p_index].y+=players[p_index].speed*deltaTime;
 		int y=(players[p_index].y-OFFSET)/TILE_DIM;
-		if(map.collisions[y][indX]) players[p_index].y=tmp;
+		if(map.collisions[y][indX]>0) players[p_index].y=tmp;
 		else indY=y;
 	}
 }
@@ -75,12 +76,13 @@ void GameLogic::extractMap() {
 		levelMap >> map.height >> c >> map.width >> c;
 		int sep=map.width>>1;
 		for(int i=0;i<map.height;i++) {
+			//fix:dont use temporary vectors
 			vector<int> v;
-			vector<bool> t;
+			vector<int> t;
 			for(int j=0;j<map.width;j++) {
 				levelMap >> tmp >> c;
 				v.push_back(tmp);
-				t.push_back(isSolid(tmp));
+				t.push_back(tileType(tmp));
 				if(tmp==COIN_BLOCK) {
 					if(j>sep) players[1].coinBlocks.push_back(CoinBlock(i,j,1,0));
 					else players[0].coinBlocks.push_back(CoinBlock(i,j,1,0));
@@ -142,24 +144,29 @@ void GameLogic::handleEvents(float deltaTime) {
 	}
 }
 
-void GameLogic::jump(int p_index,vector<vector<sf::Sprite>> &gmap,float deltaTime) {
+void GameLogic::jump(vector<vector<sf::Sprite>> &gmap,float deltaTime) {
 	if(players[p_index].state==2) {
-    players[p_index].vy-=(GRAVITY*deltaTime);
+    	players[p_index].vy-=(GRAVITY*deltaTime);
 		players[p_index].y-=players[p_index].vy*deltaTime;
 		players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
-  }
+  	}
 }
 
-void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,float deltaTime) {
+//fix: collisions bug <30fps
+void GameLogic::handleCollisions(vector<vector<sf::Sprite>> &gmap,float deltaTime) {
 	float xp,xn,yp,yn;
 	int indY=players[p_index].y/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 	sf::FloatRect rect,r=players[p_index].sprite.getGlobalBounds();
 
-	if(interactEvent) interact(p_index,indX,indY,deltaTime);
-	if(!map.collisions[indY+1][indX] && players[p_index].state!=2) {
-		if(isFalling(map.map[indY+1][indX])) players[p_index].state=2;
-		else {players[p_index].state=0;players[p_index].vy=0;}
-	}
+	if(interactEvent) interact(indX,indY,deltaTime);
+
+
+	if(players[p_index].state!=2&&map.collisions[indY+1][indX]==-1) {
+		players[p_index].state=2;
+		players[p_index].vy=0;
+	} else if(!map.collisions[indY+1][indX])
+		players[p_index].vy=1;
+
 	if(players[p_index].vx>0) {
 		xp=(indX+2>map.width)? map.width : indX+2;
 		xn=indX;
@@ -169,14 +176,14 @@ void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,fl
 	}
 
 	for(;xn<xp;xn++)
-		if(map.collisions[indY][xn] && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][xn].getGlobalBounds(),rect))) {
+		if(map.collisions[indY][xn]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][xn].getGlobalBounds(),rect))) {
 			if(rect.left>r.left) players[p_index].x-=rect.width;
 			else players[p_index].x+=rect.width;
 			players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
 			break;
 		}
 
-	jump(p_index,gmap,deltaTime);
+	jump(gmap,deltaTime);
 
 	indY=players[p_index].y/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 	if(players[p_index].vy>=0) {
@@ -187,7 +194,7 @@ void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,fl
 		yp = (indY+2>map.height)? map.height : indY+2;
 	}
 	for(;yn<yp;yn++)
-		if(map.collisions[yn][indX] && (players[p_index].sprite.getGlobalBounds().intersects(gmap[yn][indX].getGlobalBounds(),rect))) {
+		if(map.collisions[yn][indX]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[yn][indX].getGlobalBounds(),rect))) {
 			if(rect.top>=r.top) {
 				players[p_index].y-=rect.height;
 				players[p_index].state=(players[p_index].vx!=0)? 1 : 0;
@@ -199,41 +206,46 @@ void GameLogic::handleCollisions(int p_index,vector<vector<sf::Sprite>> &gmap,fl
 		}
 }
 
-void GameLogic::handleCollisions2(int p_index,vector<vector<sf::Sprite>> &gmap, float deltaTime) {
+void GameLogic::handleCollisions2(vector<vector<sf::Sprite>> &gmap, float deltaTime) {
 	int indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 	sf::FloatRect rect;
-	if(map.collisions[indY][indX] && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][indX].getGlobalBounds(),rect))) {
+	if(map.collisions[indY][indX]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][indX].getGlobalBounds(),rect))) {
 		int i=1;
+		bool move;
 		while(true) {
-			if(indX-i&&!map.collisions[indY][indX-i]) {
+			if(indX-i&&map.collisions[indY][indX-i]<=0) {
 				players[p_index].x-=rect.width;
-				break;
+				move=true;
 			}
-			if(indX+i<map.width&&!map.collisions[indY][indX+i]) {
+			if(indX+i<map.width&&map.collisions[indY][indX+i]<=0) {
 				players[p_index].x+=rect.width;
-				break;
+				move=true;
 			}
-			if(indY-i&&!map.collisions[indY-i][indX]) {
+			if(indY-i&&map.collisions[indY-i][indX]<=0) {
 				players[p_index].y+=rect.height;
-				break;
+				move=true;
 			}
-			if(indY+i<map.height&&!map.collisions[indY+i][indX]) {
+			if(indY+i<map.height&&map.collisions[indY+i][indX]<=0) {
 				players[p_index].y-=rect.height;
-				break;
+				move=true;
+			}
+			if(move) {
+				indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
+				if(map.collisions[indY][indX]<=0) break;
+				move=false;
 			}
 			++i;
 		}
-		indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 		players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
-		if(!map.collisions[indY+1][indX]) {
-				players[p_index].vy=0;
-				players[p_index].state=2;
-				players[p_index].y+=players[p_index].speed*deltaTime;
+		if(map.collisions[indY+1][indX]<=0) {
+			players[p_index].vy=0;
+			players[p_index].state=2;
+			players[p_index].y+=players[p_index].speed*deltaTime;
 		}
 	}
 }
 
-bool GameLogic::updateCoin(int p_index,float deltaTime) {
+bool GameLogic::updateCoin(float deltaTime) {
 	if(players[p_index].coin.collected) {
 		players[p_index].coin.timer+=deltaTime;
 		if(players[p_index].coin.timer>COIN_BLOCK_TIMER) {
@@ -248,7 +260,7 @@ bool GameLogic::updateCoin(int p_index,float deltaTime) {
 				x=players[other].coinBlocks[i].x;
 				y=players[other].coinBlocks[i].y;
 				map.map[x][y]=COIN_BLOCK;
-				map.collisions[x][y]=true;
+				map.collisions[x][y]=1;
 				m={y,x,COIN_BLOCK};
 				modifs.push_back(m);
 			}
@@ -269,7 +281,7 @@ bool GameLogic::updateTimerBlocks(float deltaTime) {
 			x=timerBlocks[i].x;
 			y=timerBlocks[i].y;
 			map.map[x][y]=blockValue;
-			map.collisions[x][y]=(blockValue==TIMER_BLOCK);
+			map.collisions[x][y]=(blockValue==TIMER_BLOCK)? 1:-1;
 			Modif m={y,x,blockValue};
 			modifs.push_back(m);
 		}
@@ -282,17 +294,22 @@ void GameLogic::update(float deltaTime,vector<std::vector<sf::Sprite>> &gmap) {
 	modifs.clear();
 
 	handleEvents(deltaTime);
-	handleCollisions(0,gmap,deltaTime);
-	handleCollisions(1,gmap,deltaTime);
+	handleCollisions(gmap,deltaTime);
+	p_index=1;
+	handleCollisions(gmap,deltaTime);
+	p_index=0;
 
 	interactEvent = false;
 	bool reappear1=false,reappear2=false;
-	if(updateCoin(0,deltaTime)) reappear2=true;
-	if(updateCoin(1,deltaTime)) reappear1=true;
+	if(updateCoin(deltaTime)) reappear2=true;
+	p_index=1;
+	if(updateCoin(deltaTime)) reappear1=true;
+	p_index=0;
 	if(updateTimerBlocks(deltaTime)) reappear1=reappear2=true;
-	if(reappear1) handleCollisions2(0,gmap,deltaTime);
-	if(reappear2) handleCollisions2(1,gmap,deltaTime);
-
+	if(reappear1) handleCollisions2(gmap,deltaTime);
+	p_index=1;
+	if(reappear2) handleCollisions2(gmap,deltaTime);
+	p_index=0;
 	players[0].animate(deltaTime);
 	players[1].animate(deltaTime);
 

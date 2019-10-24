@@ -19,7 +19,7 @@
 #define BOUND_X1 1088
 #define BOUND_X2 2688
 #define FRAMERATE_FONT_SIZE 24
-#define FRAMERATE 60
+#define FRAMERATE 20
 #define TILE_DIM 64
 #define EMPTY 98
 

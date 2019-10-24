@@ -40,13 +40,13 @@ class GameLogic {
 		struct Map {
 			int height,width;
 			std::vector<std::vector<int>> map;
-			std::vector<std::vector<bool>> collisions;
+			std::vector<std::vector<int>> collisions;
 		};
 		struct Modif {
 			int x,y,value;
 		};
 		GameAudio &gameAudio;
-		int level;
+		int level,p_index;
 		float timer;
 		bool pause,interactEvent,timerBlocksDisplayed,climbing;
 		Map map;
@@ -59,16 +59,17 @@ class GameLogic {
 		GameLogic(GameAudio &audio);
 		void extractMap();
 		void handleEvents(float deltaTime);
-		void jump(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
-		void handleCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
-		//check if player is on a block that just reappeared, if so, move it on the closest empty tile
-		void handleCollisions2(int p_index,std::vector<std::vector<sf::Sprite>> &gmap, float dt);
+		void jump(std::vector<std::vector<sf::Sprite>> &gmap,float dt);
+		void handleCollisions(std::vector<std::vector<sf::Sprite>> &gmap,float dt);
+		//check if the player is on a block that just reappeared, if so, move it on the closest empty tile
+		void handleCollisions2(std::vector<std::vector<sf::Sprite>> &gmap, float dt);
 		void update(float deltaTime,std::vector<std::vector<sf::Sprite>> &gmap);
-		void testCollisions(int p_index,std::vector<std::vector<sf::Sprite>> &gmap,float dt);
-		bool isSolid(int tile);
+		void testCollisions(std::vector<std::vector<sf::Sprite>> &gmap,float dt);
+		//-1:makes the player fall, 0: the players can go through (stops the fall), 1: solid object
+		int  tileType(int tile);
 		bool isFalling(int tile);
-		void interact(int p_index,int &indX,int &indY,float deltaTime);
-		bool updateCoin(int p_index,float deltaTime);
+		void interact(int &indX,int &indY,float deltaTime);
+		bool updateCoin(float deltaTime);
 		bool updateTimerBlocks(float deltaTime);
 
 		~GameLogic();
