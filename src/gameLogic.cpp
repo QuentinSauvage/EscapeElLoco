@@ -28,8 +28,8 @@ void GameLogic::interact(int &indX, int &indY,float deltaTime) {
 	Modif m;
 	if(map.map[indY][indX]==COIN) {
 		if(players[p_index].coin.timer>0) {
-			map.map[players[p_index].coin.y][players[p_index].coin.x]=COIN;
-			m={(int)players[p_index].coin.x,(int)players[p_index].coin.y,EMPTY};
+			map.map[players[p_index].coin.x][players[p_index].coin.y]=EMPTY;
+			m={(int)players[p_index].coin.y,(int)players[p_index].coin.x,EMPTY};
 			modifs.push_back(m);
 			players[p_index].coin.timer=0;
 		}
@@ -61,6 +61,13 @@ void GameLogic::interact(int &indX, int &indY,float deltaTime) {
 		int y=(players[p_index].y-OFFSET)/TILE_DIM;
 		if(map.collisions[y][indX]>0) players[p_index].y=tmp;
 		else indY=y;
+	} else if(map.map[indY][indX]==KEY) {
+		//unlock door
+	} else if((map.map[indY][indX]==CHEST_L||map.map[indY][indX]==CHEST_R)&&!players[p_index].key.collected) {
+		players[p_index].key.collected=true;
+		map.map[players[p_index].key.x][players[p_index].key.y]=KEY;
+		m={(int)players[p_index].key.y,(int)players[p_index].key.x,KEY};
+		modifs.push_back(m);
 	}
 }
 
@@ -83,19 +90,23 @@ void GameLogic::extractMap() {
 			vector<int> t;
 			for(int j=0;j<map.width;j++) {
 				levelMap >> tmp >> c;
-				v.push_back(tmp);
-				t.push_back(tileType(tmp));
 				if(tmp==COIN_BLOCK) {
 					if(j>sep) players[1].coinBlocks.push_back(CoinBlock(i,j,1,0));
 					else players[0].coinBlocks.push_back(CoinBlock(i,j,1,0));
 				} else if(tmp==COIN) {
 					if(j>sep) players[1].coins.push_back(Coin());
 					else players[0].coins.push_back(Coin());
+				} else if(tmp==KEY) {
+					if(j>sep) players[1].key=Key(i,j,1,0);
+					else players[0].key=Key(i,j,1,0);
+					tmp=EMPTY;
 				} else if(tmp==TIMER_BLOCK) {
 					timerBlocks.push_back(TimerBlock(i,j,TIMER_BLOCK_TIMER,true,1,0));
-				} else if(tmp==COLLAPSE_BLOCK) {
+					tmp=EMPTY;
+				} else if(tmp==COLLAPSE_BLOCK)
 					collapseBlocks.push_back(CollapseBlock(i,j,10.f,1,0));
-				}
+				v.push_back(tmp);
+				t.push_back(tileType(tmp));
 			}
 			map.map.push_back(v);
 			map.collisions.push_back(t);

@@ -28,6 +28,7 @@ class Key : public Entity {
 	public:
 		bool collected;
 		Key();
+		Key(float x,float y,float s,float r);
 		~Key();
 };
 

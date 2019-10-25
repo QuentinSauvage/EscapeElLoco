@@ -26,7 +26,6 @@ class Player : public Entity {
 	public:
 		int state;
 		float speed,vx,vy,timerIdle,timerRun;
-		bool coinTaken;
 		sf::Sprite sprite;
 		sf::Texture texture;
 		sf::IntRect spriteRect;

@@ -1,7 +1,7 @@
 #include "player.hpp"
 #include <iostream>
 
-Player::Player() : Entity(),speed(DEFAULT_SPEED),coinTaken(false),spriteRect(IDLE_1_OFFSET,OFFSET_Y,PLAYER_DIM,PLAYER_DIM) {
+Player::Player() : Entity(),speed(DEFAULT_SPEED),spriteRect(IDLE_1_OFFSET,OFFSET_Y,PLAYER_DIM,PLAYER_DIM) {
 	vx=0,vy=0;
 	state=0; //0:idle, 1:walking, 2:jumping, need enum
 	timerIdle=0;

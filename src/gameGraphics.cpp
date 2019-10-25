@@ -51,9 +51,8 @@ void GameGraphics::load() {
 }
 
 void GameGraphics::checkUpdate() {
-    for(size_t i=0;i<gameLogic.modifs.size();i++){
+    for(size_t i=0;i<gameLogic.modifs.size();i++)
         map[gameLogic.modifs[i].y][gameLogic.modifs[i].x].setTextureRect(IntRect((gameLogic.modifs[i].value%8)<<4,(gameLogic.modifs[i].value>>3)<<4,16,16));
-    }
 }
 
 //Each view only draw their part of the screen

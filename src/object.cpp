@@ -11,6 +11,7 @@ Coin::Coin(float x,float y,float s,float r) : Entity(x,y,s,r),timer(0),collected
 Coin::~Coin(){}
 
 Key::Key() : Entity(){}
+Key::Key(float x,float y,float s,float r) : Entity(x,y,s,r),collected(false) {}
 Key::~Key(){}
 
 Chest::Chest(){}
