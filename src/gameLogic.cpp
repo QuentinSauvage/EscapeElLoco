@@ -17,7 +17,7 @@ bool GameLogic::isFalling(int tile) {
 	return tile==EMPTY||tile==COIN;
 }
 
-//to-do:blocs qui tombent, coffre/clés=>porte déverouillées (changement de niveau)
+//to-do:blocs qui tombent, fix réapparition blocs, passage niveau suivant
 
 int GameLogic::tileType(int tile) {
 	if(tile==EMPTY||tile==COIN||tile==CHAIR_L||tile==CHAIR_R||tile==BOUQUET||
@@ -126,10 +126,12 @@ void GameLogic::extractMap() {
 					else players[0].key=Key(i,j,1,0);
 					tmp=EMPTY;
 				} else if(tmp==TIMER_BLOCK) {
-					timerBlocks.push_back(TimerBlock(i,j,TIMER_BLOCK_TIMER,true,1,0));
+					timerBlocks.push_back(TimerBlock(i,j,0,true,1,0));
 					tmp=EMPTY;
-				} else if(tmp==COLLAPSE_BLOCK)
-					collapseBlocks.push_back(CollapseBlock(i,j,10.f,1,0));
+				} else if(tmp==COLLAPSE_BLOCK) {
+					if(j>sep) collapseBlocks[1].push_back(CollapseBlock(i,j,0,1,0));
+					else collapseBlocks[0].push_back(CollapseBlock(i,j,0,1,0));
+				}
 				v.push_back(tmp);
 				t.push_back(tileType(tmp));
 			}
@@ -243,6 +245,11 @@ void GameLogic::handleCollisions(vector<vector<sf::Sprite>> &gmap,float deltaTim
 			players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
 			r = players[p_index].sprite.getGlobalBounds();
 		}
+	if(map.map[indY+1][indX]==COLLAPSE_BLOCK) {
+		for(CollapseBlock cb : collapseBlocks[p_index])
+			if(cb.x==indY+1&&cb.y==indX)
+				collapsingBlocks.push_back(cb);
+	}
 }
 
 void GameLogic::handleCollisions2(vector<vector<sf::Sprite>> &gmap, float deltaTime) {
@@ -309,6 +316,30 @@ bool GameLogic::updateCoin(float deltaTime) {
 	return false;
 }
 
+bool GameLogic::updateCollapseBlocks(float deltaTime) {
+	for(vector<CollapseBlock>::iterator it=collapsingBlocks.begin();it!=collapsingBlocks.end();++it) {
+		it->timer+=deltaTime;
+		if(it->displayed&&it->timer>COLLAPSE_BLOCK_TIMER_1) {
+			it->displayed=false;
+			it->timer=0;
+			map.map[it->x][it->y]=EMPTY;
+			map.collisions[it->x][it->y]=-1;
+			Modif m={(int)it->y,(int)it->x,EMPTY};
+			modifs.push_back(m);
+		} else if(!it->displayed&&it->timer>COLLAPSE_BLOCK_TIMER_2) {
+			it->timer=0;
+			collapsingBlocks.erase(it);
+			map.map[it->x][it->y]=COLLAPSE_BLOCK;
+			map.collisions[it->x][it->y]=1;
+			Modif m={(int)it->y,(int)it->x,COLLAPSE_BLOCK};
+			modifs.push_back(m);
+			return true;
+		}
+	}
+	return false;
+}
+
+
 bool GameLogic::updateTimerBlocks(float deltaTime) {
 	timer+=deltaTime;
 	if(timer>TIMER_BLOCK_TIMER) {
@@ -344,6 +375,7 @@ void GameLogic::update(float deltaTime,vector<std::vector<sf::Sprite>> &gmap,int
 	p_index=1;
 	if(updateCoin(deltaTime)) reappear1=true;
 	p_index=0;
+	if(updateCollapseBlocks(deltaTime)) reappear1=reappear2=true;
 	if(updateTimerBlocks(deltaTime)) reappear1=reappear2=true;
 	if(reappear1) handleCollisions2(gmap,deltaTime);
 	p_index=1;

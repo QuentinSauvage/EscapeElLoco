@@ -59,7 +59,8 @@ class GameLogic {
 		Map map;
 		std::vector<Modif> modifs;
 		std::vector<TimerBlock> timerBlocks;
-		std::vector<CollapseBlock> collapseBlocks;
+		std::vector<CollapseBlock> collapseBlocks[2];
+		std::vector<CollapseBlock> collapsingBlocks;
 		Coin coins[2];
 		Player players[2];
 
@@ -77,6 +78,7 @@ class GameLogic {
 		bool isFalling(int tile);
 		void interact(int &indX,int &indY,float deltaTime);
 		bool updateCoin(float deltaTime);
+		bool updateCollapseBlocks(float deltaTime);
 		bool updateTimerBlocks(float deltaTime);
 
 		~GameLogic();
