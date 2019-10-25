@@ -26,6 +26,7 @@ class Player : public Entity {
 	public:
 		int state;
 		float speed,vx,vy,timerIdle,timerRun;
+		bool chestOpened,doorOpened;
 		sf::Sprite sprite;
 		sf::Texture texture;
 		sf::IntRect spriteRect;
@@ -33,7 +34,6 @@ class Player : public Entity {
 		std::vector<Coin> coins;
 		Coin coin;
 		Key key;
-		Chest chest;
 
 		Player();
 		void init(float x,float y,std::string path);

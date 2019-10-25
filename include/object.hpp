@@ -3,18 +3,6 @@
 
 #include "entity.hpp"
 
-class Door : public Entity {
-	public:		
-		Door();
-		~Door();
-};
-
-class Rope : public Entity {
-	public:
-		Rope();
-		~Rope();
-};
-
 class Coin : public Entity {
 	public:
 		float timer;
@@ -30,12 +18,6 @@ class Key : public Entity {
 		Key();
 		Key(float x,float y,float s,float r);
 		~Key();
-};
-
-class Chest : public Entity {
-	public:
-		Chest();
-		~Chest();
 };
 
 #endif

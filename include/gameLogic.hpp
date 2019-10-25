@@ -31,8 +31,10 @@
 #define CHEST_L 30
 #define CHEST_R 31
 #define KEY 90
-#define DOOR_T 74
-#define DOOR_B 82
+#define DOOR_TC 74
+#define DOOR_BC 82
+#define DOOR_TO 77
+#define DOOR_BO 85
 #define TABLE 59
 #define CHAIR_L 68
 #define CHAIR_R 69
@@ -53,7 +55,7 @@ class GameLogic {
 		GameAudio &gameAudio;
 		int level,p_index;
 		float timer;
-		bool pause,interactEvent,timerBlocksDisplayed,climbing;
+		bool godMode,pause,interactEvent,timerBlocksDisplayed,climbing;
 		Map map;
 		std::vector<Modif> modifs;
 		std::vector<TimerBlock> timerBlocks;
@@ -63,12 +65,12 @@ class GameLogic {
 
 		GameLogic(GameAudio &audio);
 		void extractMap();
-		void handleEvents(float deltaTime);
+		void handleEvents(float deltaTime,int keyCode);
 		void jump(std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		void handleCollisions(std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		//check if the player is on a block that just reappeared, if so, move it on the closest empty tile
 		void handleCollisions2(std::vector<std::vector<sf::Sprite>> &gmap, float dt);
-		void update(float deltaTime,std::vector<std::vector<sf::Sprite>> &gmap);
+		void update(float deltaTime,std::vector<std::vector<sf::Sprite>> &gmap,int keyCode);
 		void testCollisions(std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		//-1:makes the player fall, 0: the players can go through (stops the fall), 1: solid object
 		int  tileType(int tile);

@@ -6,7 +6,8 @@
 
 using namespace std;
 
-GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(1),p_index(0),timer(0),pause(false),interactEvent(false),timerBlocksDisplayed(false) {
+GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(1),p_index(0),timer(0),
+godMode(false),pause(false),interactEvent(false),timerBlocksDisplayed(false) {
 	extractMap();
 	players[0].init(POSX1,POSY,PLAYER3_SPRITE);
 	players[1].init(POSX2,POSY,PLAYER4_SPRITE);
@@ -20,7 +21,8 @@ bool GameLogic::isFalling(int tile) {
 
 int GameLogic::tileType(int tile) {
 	if(tile==EMPTY||tile==COIN||tile==CHAIR_L||tile==CHAIR_R||tile==BOUQUET||
-	tile==DOOR_B||tile==DOOR_T||tile==KEY||tile==CHEST_L||tile==CHEST_R) return -1;
+	tile==DOOR_BC||tile==DOOR_TC||tile==DOOR_BO||tile==DOOR_TO||
+	tile==KEY||tile==CHEST_L||tile==CHEST_R) return -1;
 	return tile!=LADDER&&tile!=ROPE&&tile!=ROPE_TOP&&tile!=ROPE_END;
 }
 
@@ -62,12 +64,35 @@ void GameLogic::interact(int &indX, int &indY,float deltaTime) {
 		if(map.collisions[y][indX]>0) players[p_index].y=tmp;
 		else indY=y;
 	} else if(map.map[indY][indX]==KEY) {
-		//unlock door
-	} else if((map.map[indY][indX]==CHEST_L||map.map[indY][indX]==CHEST_R)&&!players[p_index].key.collected) {
 		players[p_index].key.collected=true;
+		map.map[players[p_index].key.x][players[p_index].key.y]=EMPTY;
+		m={(int)players[p_index].key.y,(int)players[p_index].key.x,EMPTY};
+		modifs.push_back(m);
+	} else if((map.map[indY][indX]==CHEST_L||map.map[indY][indX]==CHEST_R)&&!players[p_index].chestOpened) {
+		players[p_index].chestOpened=true;
 		map.map[players[p_index].key.x][players[p_index].key.y]=KEY;
 		m={(int)players[p_index].key.y,(int)players[p_index].key.x,KEY};
 		modifs.push_back(m);
+	} else if((map.map[indY][indX]==DOOR_TC||map.map[indY][indX]==DOOR_BC)&&players[p_index].key.collected) {
+		players[p_index].doorOpened=true;
+		if(map.map[indY][indX]==DOOR_TC) {
+			map.map[indY][indX]=DOOR_TO;
+			map.map[indY+1][indX]=DOOR_BO;
+			m={indX,indY,DOOR_TO};
+			modifs.push_back(m);
+			m={indX,indY+1,DOOR_BO};
+			modifs.push_back(m);
+		} else {
+			map.map[indY][indX]=DOOR_BO;
+			map.map[indY-1][indX]=DOOR_BO;
+			m={indX,indY-1,DOOR_TO};
+			modifs.push_back(m);
+			m={indX,indY,DOOR_BO};
+			modifs.push_back(m);
+		}
+		if(players[(p_index+1)%2].doorOpened) {
+			cout << "fini" << endl;
+		}
 	}
 }
 
@@ -116,7 +141,7 @@ void GameLogic::extractMap() {
 }
 
 //handle inputs from the user
-void GameLogic::handleEvents(float deltaTime) {
+void GameLogic::handleEvents(float deltaTime,int keyCode) {
 	if(!pause) {
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
 			players[0].move(-1,deltaTime);
@@ -129,24 +154,25 @@ void GameLogic::handleEvents(float deltaTime) {
 			players[1].vx=0;
 		}
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-			if(players[0].state!=2) {
+			if(godMode||players[0].state!=2) {
 				players[0].vy=JUMP_VELOCITY;
 				players[0].state=2;
 				if(gameAudio.playing) gameAudio.jumpSoundLeft.play();
 			}
-			if(players[1].state!=2) {
+			if(godMode||players[1].state!=2) {
 				players[1].vy=JUMP_VELOCITY;
 				players[1].state=2;
 				if(gameAudio.playing) gameAudio.jumpSoundRight.play();
 			}
 		}
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
+		if(keyCode==sf::Keyboard::R) {
 			players[0].x=POSX1;
 			players[1].x=POSX2;
 			players[0].y=players[1].y=POSY;
 			players[0].state=players[1].state=0;
 		}
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)) gameAudio.changeState();
+		if(keyCode==sf::Keyboard::A) gameAudio.changeState();
+		if(keyCode==sf::Keyboard::G) godMode=!godMode;
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
 			climbing=true;
 			interactEvent = true;
@@ -303,10 +329,10 @@ bool GameLogic::updateTimerBlocks(float deltaTime) {
 	return false;
 }
 
-void GameLogic::update(float deltaTime,vector<std::vector<sf::Sprite>> &gmap) {
+void GameLogic::update(float deltaTime,vector<std::vector<sf::Sprite>> &gmap,int keyCode) {
 	modifs.clear();
 
-	handleEvents(deltaTime);
+	handleEvents(deltaTime,keyCode);
 	handleCollisions(gmap,deltaTime);
 	p_index=1;
 	handleCollisions(gmap,deltaTime);

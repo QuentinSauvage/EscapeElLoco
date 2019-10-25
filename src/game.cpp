@@ -14,16 +14,19 @@ void Game::run() {
     Clock clock;
     Event event;
     gameAudio.load();
+    int keyCode;
     while(gameGraphics.window.isOpen())
     {
+        keyCode=-1;
         while(gameGraphics.window.pollEvent(event)) {
             if(event.type==Event::Closed)
                 gameGraphics.window.close();
             else if(event.type==Event::LostFocus) gameLogic.pause=true;
             else if(event.type==Event::GainedFocus) gameLogic.pause=false;
+            else if(event.type==Event::KeyReleased) keyCode=event.key.code;
         }
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) break;
-        gameLogic.update(deltaTime,gameGraphics.map);
+        gameLogic.update(deltaTime,gameGraphics.map,keyCode);
         gameGraphics.update(deltaTime);
         
         deltaTime=clock.getElapsedTime().asSeconds();
