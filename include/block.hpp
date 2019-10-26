@@ -3,7 +3,7 @@
 
 #include "entity.hpp"
 
-#define COLLAPSE_BLOCK_TIMER_1 1.0f
+#define COLLAPSE_BLOCK_TIMER_1 0.3f
 #define COLLAPSE_BLOCK_TIMER_2 3.0f
 #define TIMER_BLOCK_TIMER 2.5f
 #define COIN_BLOCK_TIMER 7.0f

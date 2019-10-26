@@ -1,16 +1,17 @@
 #include "player.hpp"
 #include <iostream>
 
-Player::Player() : Entity(),speed(DEFAULT_SPEED),chestOpened(false),doorOpened(false),spriteRect(IDLE_1_OFFSET,OFFSET_Y,PLAYER_DIM,PLAYER_DIM) {
-	vx=0,vy=0;
-	state=0; //0:idle, 1:walking, 2:jumping, need enum
-	timerIdle=0;
-	timerRun=0;
-} 
+Player::Player() : Entity(),speed(DEFAULT_SPEED),chestOpened(false),doorOpened(false),spriteRect(IDLE_1_OFFSET,OFFSET_Y,PLAYER_DIM,PLAYER_DIM) {} 
 
 void Player::init(float x,float y,std::string path){
 	this->x=x;
 	this->y=y;
+	origin_x=x;
+	origin_y=y;
+	vx=0,vy=0;
+	state=0; //0:idle, 1:walking, 2:jumping, need enum
+	timerIdle=0;
+	timerRun=0;
 	if(!texture.loadFromFile(path)) {
     	std::cout << LOAD_PLAYER_SPRITE_ERROR << std::endl;
     	exit(1);

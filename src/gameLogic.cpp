@@ -6,18 +6,30 @@
 
 using namespace std;
 
-GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(1),p_index(0),timer(0),
-godMode(false),pause(false),interactEvent(false),timerBlocksDisplayed(false) {
+GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(1),p_index(0),pause(false),end(false) {
+	initLevel();
+}
+
+void GameLogic::clear() {
+	++level;
+	end=true;
+	modifs.clear();
+	map.map.clear();
+	map.collisions.clear();
+	timerBlocks.clear();
+	collapseBlocks[0].clear();
+	collapseBlocks[1].clear();
+	collapsingBlocks.clear();
+}
+
+void GameLogic::initLevel() {
+	timer=0;
+	godMode=interactEvent=timerBlocksDisplayed=false;
 	extractMap();
-	players[0].init(POSX1,POSY,PLAYER3_SPRITE);
-	players[1].init(POSX2,POSY,PLAYER4_SPRITE);
 }
 
-bool GameLogic::isFalling(int tile) {
-	return tile==EMPTY||tile==COIN;
-}
-
-//to-do:blocs qui tombent, fix réapparition blocs, passage niveau suivant
+//to-do:fix réapparition blocs, passage niveau suivant
+//enlever utilisation de vecteurs temporaires (aussi dans gameGraphics)
 
 int GameLogic::tileType(int tile) {
 	if(tile==EMPTY||tile==COIN||tile==CHAIR_L||tile==CHAIR_R||tile==BOUQUET||
@@ -91,12 +103,12 @@ void GameLogic::interact(int &indX, int &indY,float deltaTime) {
 			modifs.push_back(m);
 		}
 		if(players[(p_index+1)%2].doorOpened) {
-			cout << "fini" << endl;
+			clear();
+			initLevel();
 		}
 	}
 }
 
-//extract map from file
 void GameLogic::extractMap() {
 	ifstream levelMap;
 	string filename=PATH_LEVEL;
@@ -107,10 +119,12 @@ void GameLogic::extractMap() {
 
 	vector<CoinBlock> coinBlocks;
 	if(levelMap.good()) {
+		int posX1,posX2,posY1,posY2;
 		levelMap >> map.height >> c >> map.width >> c;
+		levelMap >> posX1 >> c >> posY1 >> c;
+		levelMap >> posX2 >> c >> posY2 >> c;
 		int sep=map.width>>1;
 		for(int i=0;i<map.height;i++) {
-			//fix:dont use temporary vectors
 			vector<int> v;
 			vector<int> t;
 			for(int j=0;j<map.width;j++) {
@@ -139,7 +153,9 @@ void GameLogic::extractMap() {
 			map.collisions.push_back(t);
 		}
 		levelMap.close();
-	} else cerr << LOAD_MAP_ERROR;
+		players[0].init(posX1,posY1,PLAYER3_SPRITE);
+		players[1].init(posX2,posY2,PLAYER4_SPRITE);
+	} else cerr << LOAD_MAP_ERROR,exit(1);
 }
 
 //handle inputs from the user
@@ -168,9 +184,10 @@ void GameLogic::handleEvents(float deltaTime,int keyCode) {
 			}
 		}
 		if(keyCode==sf::Keyboard::R) {
-			players[0].x=POSX1;
-			players[1].x=POSX2;
-			players[0].y=players[1].y=POSY;
+			players[0].x=players[0].origin_x;
+			players[1].x=players[1].origin_x;
+			players[0].y=players[0].origin_y;
+			players[1].y=players[1].origin_y;
 			players[0].state=players[1].state=0;
 		}
 		if(keyCode==sf::Keyboard::A) gameAudio.changeState();

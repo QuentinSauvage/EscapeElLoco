@@ -39,6 +39,8 @@
 #define CHAIR_L 68
 #define CHAIR_R 69
 #define BOUQUET 60
+#define PLAYER1_SPRITE "sprites/dino/1.png"
+#define PLAYER2_SPRITE "sprites/dino/2.png"
 #define PLAYER3_SPRITE "sprites/dino/3.png"
 #define PLAYER4_SPRITE "sprites/dino/4.png"
 
@@ -55,7 +57,7 @@ class GameLogic {
 		GameAudio &gameAudio;
 		int level,p_index;
 		float timer;
-		bool godMode,pause,interactEvent,timerBlocksDisplayed,climbing;
+		bool godMode,pause,interactEvent,timerBlocksDisplayed,climbing,end;
 		Map map;
 		std::vector<Modif> modifs;
 		std::vector<TimerBlock> timerBlocks;
@@ -65,6 +67,8 @@ class GameLogic {
 		Player players[2];
 
 		GameLogic(GameAudio &audio);
+		void clear();
+		void initLevel();
 		void extractMap();
 		void handleEvents(float deltaTime,int keyCode);
 		void jump(std::vector<std::vector<sf::Sprite>> &gmap,float dt);
@@ -75,7 +79,6 @@ class GameLogic {
 		void testCollisions(std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		//-1:makes the player fall, 0: the players can go through (stops the fall), 1: solid object
 		int  tileType(int tile);
-		bool isFalling(int tile);
 		void interact(int &indX,int &indY,float deltaTime);
 		bool updateCoin(float deltaTime);
 		bool updateCollapseBlocks(float deltaTime);

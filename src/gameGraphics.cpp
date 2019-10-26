@@ -8,24 +8,19 @@ GameGraphics::GameGraphics(GameLogic &gl) : gameLogic(gl) {
 	init();
 }
 
-void GameGraphics::load() {
-    if(!playersTexture[0].loadFromFile(PLAYER3_SPRITE)) {
+void GameGraphics::loadMap() {
+    const char *sprite1, *sprite2;
+    if(!(gameLogic.level%2)) sprite1=PLAYER1_SPRITE,sprite2=PLAYER2_SPRITE;
+    else sprite1=PLAYER3_SPRITE,sprite2=PLAYER4_SPRITE;
+    if(!playersTexture[0].loadFromFile(sprite1)) {
         std::cerr << LOAD_PLAYER_SPRITE_ERROR << std::endl;
         exit(1);
     }
-    if(!playersTexture[1].loadFromFile(PLAYER4_SPRITE)) {
+    if(!playersTexture[1].loadFromFile(sprite2)) {
         std::cerr << LOAD_PLAYER_SPRITE_ERROR << std::endl;
         exit(1);
     }
-    if(!background.loadFromFile(LOAD_TILESET)) {
-        std::cerr << LOAD_TILESET_ERROR << std::endl;
-        exit(1);
-    }
-    if(!font.loadFromFile(LOAD_FONT)) {
-        std::cerr << LOAD_FONT_ERROR << std::endl;
-        return;
-    }
-    
+
     sf::Sprite s;
     for(int i=0; i<gameLogic.map.height;i++) {
         std::vector<Sprite> v;
@@ -50,9 +45,27 @@ void GameGraphics::load() {
     for(int i=0;i<2;i++) gameLogic.players[i].setSprite(playersTexture[i]);
 }
 
+void GameGraphics::load() {
+    if(!background.loadFromFile(LOAD_TILESET)) {
+        std::cerr << LOAD_TILESET_ERROR << std::endl;
+        exit(1);
+    }
+    if(!font.loadFromFile(LOAD_FONT)) {
+        std::cerr << LOAD_FONT_ERROR << std::endl;
+        return;
+    }
+    loadMap();
+}
+
 void GameGraphics::checkUpdate() {
-    for(size_t i=0;i<gameLogic.modifs.size();i++)
-        map[gameLogic.modifs[i].y][gameLogic.modifs[i].x].setTextureRect(IntRect((gameLogic.modifs[i].value%8)<<4,(gameLogic.modifs[i].value>>3)<<4,16,16));
+    if(gameLogic.end) {
+        std::cout << "gameLogic.end" << std::endl;
+        gameLogic.end=false;
+        reinit();
+    } else {
+        for(size_t i=0;i<gameLogic.modifs.size();i++)
+            map[gameLogic.modifs[i].y][gameLogic.modifs[i].x].setTextureRect(IntRect((gameLogic.modifs[i].value%8)<<4,(gameLogic.modifs[i].value>>3)<<4,16,16));
+    }
 }
 
 //Each view only draw their part of the screen
@@ -86,6 +99,12 @@ void GameGraphics::buildWindow() {
 	border.setPosition((window.getSize().x/2)-(sizeX/2),0);
     border.setSize(sf::Vector2f(sizeX,window.getSize().y));
     border.setFillColor(Color(192,192,192));
+}
+
+void GameGraphics::reinit() {
+    map.clear();
+    loadMap();
+    screenLimit=gameLogic.map.width>>1;
 }
 
 void GameGraphics::init() {

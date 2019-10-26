@@ -25,7 +25,7 @@
 class Player : public Entity {
 	public:
 		int state;
-		float speed,vx,vy,timerIdle,timerRun;
+		float speed,vx,vy,timerIdle,timerRun,origin_x,origin_y;
 		bool chestOpened,doorOpened;
 		sf::Sprite sprite;
 		sf::Texture texture;
