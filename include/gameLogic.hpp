@@ -43,6 +43,8 @@
 #define PLAYER2_SPRITE "sprites/dino/2.png"
 #define PLAYER3_SPRITE "sprites/dino/3.png"
 #define PLAYER4_SPRITE "sprites/dino/4.png"
+#define TIMER_EL_LOCO_1 10.0f
+#define TIMER_EL_LOCO_2 10.4f
 
 class GameLogic {
 	public:
@@ -56,13 +58,14 @@ class GameLogic {
 		};
 		GameAudio &gameAudio;
 		int level,p_index;
-		float timer;
-		bool godMode,pause,interactEvent,timerBlocksDisplayed,climbing,end;
+		float timer,timerElLoco;
+		bool godMode,pause,interactEvent,timerBlocksDisplayed,climbing,end,elLocoDisplayed;
 		Map map;
 		std::vector<Modif> modifs;
 		std::vector<TimerBlock> timerBlocks;
 		std::vector<CollapseBlock> collapseBlocks[2];
 		std::vector<CollapseBlock> collapsingBlocks;
+		sf::Sprite elLoco;
 		Coin coins[2];
 		Player players[2];
 

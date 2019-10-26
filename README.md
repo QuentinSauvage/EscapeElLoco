@@ -15,7 +15,7 @@ _R_ : Reset positions of the dragons (other properties such as collected keys wi
 _Escape_ : Exit the game.
 
 # Goals
-Our four dragons, __Yellow__, __Green__, __Blue__ and __Red__, have been kept prisonners by the ruthless wizard __El Loco__. They now have to climb his infernal tower in order to escape this hell.
+Our four dragons, __Yellow__, __Green__, __Blue__ and __Red__, have been kept prisonners by the ruthless wizard __El Loco__. They now have to climb his infernal tower in order to escape this hell while their host tries to take control of their precious bodies.
 
 # How the game works
 Since the dragons are bonded by the dragon's pact, they move together. This means for instance that when _Yellow_ goes left, _Green_ goes left too, and so on.

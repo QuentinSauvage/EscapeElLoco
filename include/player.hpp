@@ -27,7 +27,7 @@ class Player : public Entity {
 		int state;
 		float speed,vx,vy,timerIdle,timerRun,origin_x,origin_y;
 		bool chestOpened,doorOpened;
-		sf::Sprite sprite;
+		sf::Sprite sprite,oldSprite;
 		sf::Texture texture;
 		sf::IntRect spriteRect;
 		std::vector<CoinBlock> coinBlocks;

@@ -24,6 +24,7 @@ void Player::setSprite(sf::Texture &t) {
 	sprite.setOrigin(8,8);
     sprite.setPosition(x,y);
     sprite.setScale(4.f,4.f);
+	oldSprite=sprite;
 }
 
 void Player::animate(float timer) {

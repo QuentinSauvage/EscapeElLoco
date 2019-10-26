@@ -54,6 +54,13 @@ void GameGraphics::load() {
         std::cerr << LOAD_FONT_ERROR << std::endl;
         return;
     }
+    if(!elLocoTexture.loadFromFile(LOAD_EL_LOCO)) {
+        std::cerr << EL_LOCO_ERROR << std::endl;
+        exit(1);
+    }
+    elLocoSprite.setTexture(elLocoTexture);
+    elLocoSprite.setOrigin(32,32);
+    gameLogic.elLoco=elLocoSprite;
     loadMap();
 }
 
@@ -143,6 +150,7 @@ void GameGraphics::update(float deltaTime) {
 
     window.setView(viewRight);
     drawBackground(1);
+    
     window.draw(gameLogic.players[1].sprite);
     
     window.setView(window.getDefaultView());

@@ -23,8 +23,8 @@ void GameLogic::clear() {
 }
 
 void GameLogic::initLevel() {
-	timer=0;
-	godMode=interactEvent=timerBlocksDisplayed=false;
+	timer=timerElLoco=0;
+	godMode=interactEvent=timerBlocksDisplayed=elLocoDisplayed=false;
 	extractMap();
 }
 
@@ -398,8 +398,22 @@ void GameLogic::update(float deltaTime,vector<std::vector<sf::Sprite>> &gmap,int
 	p_index=1;
 	if(reappear2) handleCollisions2(gmap,deltaTime);
 	p_index=0;
-	players[0].animate(deltaTime);
-	players[1].animate(deltaTime);
+
+	timerElLoco+=deltaTime;
+	if(timerElLoco>TIMER_EL_LOCO_2) {
+		timerElLoco=0;
+		elLocoDisplayed=false;
+		players[0].sprite=players[0].oldSprite;
+		players[1].sprite=players[1].oldSprite;
+	} else if(timerElLoco>TIMER_EL_LOCO_1&&!elLocoDisplayed) {
+		elLocoDisplayed=true;
+		players[0].oldSprite=players[0].sprite;
+		players[1].oldSprite=players[1].sprite;
+		players[0].sprite=players[1].sprite=elLoco;
+	} else if(!elLocoDisplayed){
+		players[0].animate(deltaTime);
+		players[1].animate(deltaTime);
+	}
 
 	players[0].sprite.setPosition(players[0].x,players[0].y);
 	players[1].sprite.setPosition(players[1].x,players[1].y);
