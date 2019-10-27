@@ -1,10 +1,10 @@
-# 60FPS-SFML
-Projet SFML M2ILJ-S1
+# Escape El Loco
+This project was made during my final year of master's degree. It is made using C++ and the SFML API.
 
 # Controls
-_Left/right arrows_ : Move on the X-axis.
+_←/→_ : Move on the X-axis.
 
-_Up/down arrows_ : Interact with an object (chest, key, door and coin). Move up or down on ladders and ropes.
+_↑/↓_ : Interact with an object (chest, key, door and coin). Move up or down on ladders and ropes.
 
 _Space bar_ : Jump
 
@@ -23,7 +23,7 @@ Since the dragons are bonded by the dragon's pact, they move together. This mean
 They have to escape each rooms by opening the door relative to their side. To do that, they have to open a chest which will release a key. They finally have to collect this key in order to open the door which will allow them to set them free. This way, once each door has been opened, the level ends.
 
 <details>
-  <summary>Spoiler warning</summary>
+  <summary>Cheat</summary>
   
   If you find the game too difficult, press _G_ to enter __God Mode__. This will allow you to chain jumps and reach every places you want.
   
