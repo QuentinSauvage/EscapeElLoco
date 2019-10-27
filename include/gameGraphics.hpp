@@ -12,7 +12,7 @@
 #define LOAD_FONT "fonts/mismo/Mismo Black.ttf"
 #define LOAD_FONT_ERROR "Error when loading Mismo Black.ttf"
 #define EL_LOCO_ERROR "Error when loading El Loco"
-#define TITLE "I Have No Friends"
+#define TITLE "Escape El Loco"
 #define LEFT_CENTER_X 512
 #define RIGHT_CENTER_X 2112
 #define CENTER_Y 1408
