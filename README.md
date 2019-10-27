@@ -28,3 +28,8 @@ They have to escape each rooms by opening the door relative to their side. To do
   If you find the game too difficult, press _G_ to enter __God Mode__. This will allow you to chain jumps and reach every places you want.
   
 </details>
+
+# Build & Run
+```shell
+make && ./app
+```
