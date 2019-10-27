@@ -1,5 +1,5 @@
 # Escape El Loco
-This project was made during my final year of master's degree. It is made using C++ and the SFML API.
+This platformer was made during my final year of master's degree. It is made using C++ and the SFML API and its goal is to keep the game running at 60fps by correctly managing the game loop correctly.
 
 # Controls
 _←/→_ : Move on the X-axis.
