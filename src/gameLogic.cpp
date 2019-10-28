@@ -30,14 +30,14 @@ void GameLogic::initLevel() {
 
 //enlever utilisation de vecteurs temporaires (aussi dans gameGraphics)
 
-int GameLogic::tileType(int tile) {
+int GameLogic::tileType(int tile) const {
 	if(tile==EMPTY||tile==COIN||tile==CHAIR_L||tile==CHAIR_R||tile==BOUQUET||
 	tile==DOOR_BC||tile==DOOR_TC||tile==DOOR_BO||tile==DOOR_TO||
 	tile==KEY||tile==CHEST_L||tile==CHEST_R) return -1;
 	return tile!=LADDER&&tile!=ROPE&&tile!=ROPE_TOP&&tile!=ROPE_END;
 }
 
-void GameLogic::interact(int &indX, int &indY,float deltaTime) {
+void GameLogic::interact(int indX, int indY,float deltaTime) {
 	Modif m;
 	if(map.map[indY][indX]==COIN&&!players[p_index].coin.collected) {
 		if(players[p_index].coin.timer>0) {
@@ -89,16 +89,16 @@ void GameLogic::interact(int &indX, int &indY,float deltaTime) {
 		if(map.map[indY][indX]==DOOR_TC) {
 			map.map[indY][indX]=DOOR_TO;
 			map.map[indY+1][indX]=DOOR_BO;
-			m={indX,indY,DOOR_TO};
+			m={indX,indY,DOOR_TO,16};
 			modifs.push_back(m);
 			m={indX,indY+1,DOOR_BO,16,16};
 			modifs.push_back(m);
 		} else {
 			map.map[indY][indX]=DOOR_BO;
 			map.map[indY-1][indX]=DOOR_BO;
-			m={indX,indY-1,DOOR_TO,16};
+			m={indX,indY-1,DOOR_TO,16,16};
 			modifs.push_back(m);
-			m={indX,indY,DOOR_BO,16};
+			m={indX,indY,DOOR_BO,16,16};
 			modifs.push_back(m);
 		}
 		if(players[(p_index+1)%2].doorOpened) {
@@ -201,7 +201,7 @@ void GameLogic::handleEvents(float deltaTime,int keyCode) {
 	}
 }
 
-void GameLogic::jump(vector<vector<sf::Sprite>> &gmap,float deltaTime) {
+void GameLogic::jump(float deltaTime) {
 	if(players[p_index].state==2) {
     	players[p_index].vy-=(GRAVITY*deltaTime);
 		players[p_index].y-=players[p_index].vy*deltaTime;
@@ -209,13 +209,12 @@ void GameLogic::jump(vector<vector<sf::Sprite>> &gmap,float deltaTime) {
   	}
 }
 
-void GameLogic::handleCollisions(vector<vector<sf::Sprite>> &gmap,float deltaTime) {
+void GameLogic::handleCollisions(const vector<vector<sf::Sprite>> &gmap,float deltaTime) {
 	float xp,xn,yp,yn;
 	int indY=players[p_index].y/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 	sf::FloatRect rect,r=players[p_index].sprite.getGlobalBounds();
 
 	if(interactEvent) interact(indX,indY,deltaTime);
-
 
 	if(players[p_index].state!=2&&map.collisions[indY+1][indX]==-1) {
 		players[p_index].state=2;
@@ -231,6 +230,7 @@ void GameLogic::handleCollisions(vector<vector<sf::Sprite>> &gmap,float deltaTim
 		xn=(indX-2<0)? 0 : indX-2;
 	}
 
+	//collision on x-axis
 	for(;xn<xp;xn++)
 		if(map.collisions[indY][xn]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][xn].getGlobalBounds(),rect))) {
 			if(rect.left>r.left) players[p_index].x-=rect.width;
@@ -239,7 +239,7 @@ void GameLogic::handleCollisions(vector<vector<sf::Sprite>> &gmap,float deltaTim
 			break;
 		}
 
-	jump(gmap,deltaTime);
+	jump(deltaTime);
 
 	indY=players[p_index].y/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 	if(players[p_index].vy>=0) {
@@ -249,6 +249,8 @@ void GameLogic::handleCollisions(vector<vector<sf::Sprite>> &gmap,float deltaTim
 		yn = indY;
 		yp = (indY+2>map.height)? map.height : indY+2;
 	}
+
+	//collision on y-axis
 	for(;yn<yp;yn++)
 		if(map.collisions[yn][indX]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[yn][indX].getGlobalBounds(),rect))) {
 			if(rect.top>=r.top) {
@@ -268,44 +270,38 @@ void GameLogic::handleCollisions(vector<vector<sf::Sprite>> &gmap,float deltaTim
 	}
 }
 
-void GameLogic::handleCollisions2(vector<vector<sf::Sprite>> &gmap, float deltaTime) {
+void GameLogic::handleCollisions2(const vector<vector<sf::Sprite>> &gmap, float deltaTime) {
 	int indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM,i=1;
 	sf::FloatRect rect;
 	if(map.collisions[indY][indX]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][indX].getGlobalBounds(),rect))) {
 		bool move;
 		while(true) {
+			//search for the closest empty tile (doesn't check every tile)
 			if(indX-i&&map.collisions[indY][indX-i]<=0) {
 				players[p_index].x-=(rect.width+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
 				move=true;
-			} else
-			if(indX+i<map.width&&map.collisions[indY][indX+i]<=0) {
+			} else if(indX+i<map.width&&map.collisions[indY][indX+i]<=0) {
 				players[p_index].x+=(rect.width+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
 				move=true;
-			} else
-			if(indY-i&&map.collisions[indY-i][indX]<=0) {
+			} else if(indY-i&&map.collisions[indY-i][indX]<=0) {
 				players[p_index].y+=(rect.height+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
 				move=true;
-			} else
-			if(indY+i<map.height&&map.collisions[indY+i][indX]<=0) {
+			} else if(indY+i<map.height&&map.collisions[indY+i][indX]<=0) {
 				players[p_index].y-=(rect.height+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
 				move=true;
-			} else
-			if(indX-i&&indY-i&&map.collisions[indY-i][indX-i]<=0) {
+			} else if(indX-i&&indY-i&&map.collisions[indY-i][indX-i]<=0) {
 				players[p_index].x-=(rect.width+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
 				players[p_index].y-=(rect.height+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
 				move=true;
-			} else
-			if(indX+i<map.width&&indY+i<map.height&&map.collisions[indY+i][indX+i]<=0) {
+			} else if(indX+i<map.width&&indY+i<map.height&&map.collisions[indY+i][indX+i]<=0) {
 				players[p_index].x+=(rect.width+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
 				players[p_index].y+=(rect.height+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
 				move=true;
-			} else
-			if(indX+i<map.width&&indY-i&&map.collisions[indY-i][indX+i]<=0) {
+			} else if(indX+i<map.width&&indY-i&&map.collisions[indY-i][indX+i]<=0) {
 				players[p_index].x+=(rect.width+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
 				players[p_index].y-=(rect.height+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
 				move=true;
-			} else
-			if(indX-i&&indY+i<map.height&&map.collisions[indY+i][indX-i]<=0) {
+			} else if(indX-i&&indY+i<map.height&&map.collisions[indY+i][indX-i]<=0) {
 				players[p_index].x-=(rect.width+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
 				players[p_index].y+=(rect.height+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
 				move=true;
@@ -313,7 +309,6 @@ void GameLogic::handleCollisions2(vector<vector<sf::Sprite>> &gmap, float deltaT
 			if(move) {
 				indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 				break;
-				move=false;
 			}
 			++i;
 		}
@@ -395,28 +390,7 @@ bool GameLogic::updateTimerBlocks(float deltaTime) {
 	return false;
 }
 
-void GameLogic::update(float deltaTime,vector<std::vector<sf::Sprite>> &gmap,int keyCode) {
-	modifs.clear();
-
-	handleEvents(deltaTime,keyCode);
-	handleCollisions(gmap,deltaTime);
-	p_index=1;
-	handleCollisions(gmap,deltaTime);
-	p_index=0;
-
-	interactEvent = false;
-	bool reappear1=false,reappear2=false;
-	if(updateCoin(deltaTime)) reappear2=true;
-	p_index=1;
-	if(updateCoin(deltaTime)) reappear1=true;
-	p_index=0;
-	if(updateCollapseBlocks(deltaTime)) reappear1=reappear2=true;
-	if(updateTimerBlocks(deltaTime)) reappear1=reappear2=true;
-	if(reappear1) handleCollisions2(gmap,deltaTime);
-	p_index=1;
-	if(reappear2) handleCollisions2(gmap,deltaTime);
-	p_index=0;
-
+void GameLogic::animateElLoco(float deltaTime) {
 	timerElLoco+=deltaTime;
 	if(timerElLoco>TIMER_EL_LOCO_2) {
 		timerElLoco=0;
@@ -432,6 +406,29 @@ void GameLogic::update(float deltaTime,vector<std::vector<sf::Sprite>> &gmap,int
 		players[0].animate(deltaTime);
 		players[1].animate(deltaTime);
 	}
+}
+
+void GameLogic::update(float deltaTime,const vector<std::vector<sf::Sprite>> &gmap,int keyCode) {
+	modifs.clear();
+
+	interactEvent = false;
+	bool reappear1=false,reappear2=false;
+
+	handleEvents(deltaTime,keyCode);
+	handleCollisions(gmap,deltaTime);
+	if(updateCoin(deltaTime)) reappear2=true;
+	p_index=1;
+	handleCollisions(gmap,deltaTime);
+	if(updateCoin(deltaTime)) reappear1=true;
+	
+	if(updateCollapseBlocks(deltaTime)) reappear1=reappear2=true;
+	if(updateTimerBlocks(deltaTime)) reappear1=reappear2=true;
+
+	if(reappear1) handleCollisions2(gmap,deltaTime);
+	p_index=0;
+	if(reappear2) handleCollisions2(gmap,deltaTime);
+
+	animateElLoco(deltaTime);
 
 	players[0].sprite.setPosition(players[0].x,players[0].y);
 	players[1].sprite.setPosition(players[1].x,players[1].y);

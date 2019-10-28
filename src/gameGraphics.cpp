@@ -44,12 +44,15 @@ void GameGraphics::loadMap() {
     }
     for(int i=0;i<2;i++) gameLogic.players[i].setSprite(playersTexture[i]);
     
-    bound_min_y=viewLeft.getSize().y/2;
-    bound_max_y=(gameLogic.map.height*64)-(viewLeft.getSize().y/2);
-    left_center_x=viewLeft.getSize().x/2;
-    right_center_x=left_center_x + ((gameLogic.map.width/2) * 64);
-    bound_x1=((gameLogic.map.width/2) * 64) - (viewLeft.getSize().x / 2);
-    bound_x2=(gameLogic.map.width*64) - (viewRight.getSize().x / 2);
+    //init bounds for the views
+    Vector2f size=viewLeft.getSize();
+    int widthLimit=(gameLogic.map.width>>1)<<6;
+    bound_min_y=size.y/2;
+    bound_max_y=gameLogic.map.height*64-bound_min_y;
+    left_center_x=size.x/2;
+    right_center_x=left_center_x+widthLimit;
+    bound_x1=widthLimit-left_center_x;
+    bound_x2=gameLogic.map.width*64-left_center_x;
 }
 
 void GameGraphics::load() {
@@ -144,16 +147,19 @@ void GameGraphics::reinit() {
 void GameGraphics::init() {
     buildWindow();
     load();
+
+    //build framerateText
     framerateText.setFont(font);
     framerateText.setCharacterSize(FRAMERATE_FONT_SIZE);
     framerateText.setFillColor(Color::White);
     framerateText.setOutlineThickness(1);
     framerateText.setOutlineColor(Color::Blue);
     framerateText.setPosition(window.getSize().x-100,0);
+
     screenLimit=gameLogic.map.width>>1;
 }
 
-float clamp(float v,float min,float max) {
+float GameGraphics::clamp(float v,float min,float max) const {
     if(v<min) return min;
     if(v>max) return max;
     return v; 
@@ -177,7 +183,6 @@ void GameGraphics::update(float deltaTime) {
 
     window.setView(viewRight);
     drawBackground(1);
-    
     window.draw(gameLogic.players[1].sprite);
     
     window.setView(window.getDefaultView());

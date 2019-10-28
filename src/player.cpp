@@ -8,12 +8,9 @@ void Player::init(float x,float y,std::string path){
 	this->y=y;
 	origin_x=x;
 	origin_y=y;
-	vx=0,vy=0;
-	state=0; //0:idle, 1:walking, 2:jumping, need enum
-	timerIdle=0;
-	timerRun=0;
+	vx=vy=state=timerIdle=timerRun=0;
 	if(!texture.loadFromFile(path)) {
-    	std::cout << LOAD_PLAYER_SPRITE_ERROR << std::endl;
+    	std::cerr << LOAD_PLAYER_SPRITE_ERROR << std::endl;
     	exit(1);
     }
 }
@@ -27,6 +24,15 @@ void Player::setSprite(sf::Texture &t) {
 	oldSprite=sprite;
 }
 
+void Player::animateRun(float t1,float t2,int s,int offset1,int offset2) {
+	if(t1>t2 && state==s)
+		spriteRect.left=(spriteRect.left == offset1)? offset2 : offset1;
+	else if(state!=s) {
+		state=s;
+		spriteRect.left=offset1;
+	}
+}
+
 void Player::animate(float timer) {
 	timerIdle+=timer;
 	timerRun+=timer;
@@ -38,28 +44,13 @@ void Player::animate(float timer) {
 		else if(vx>0) sprite.setScale(4.f,4.f);
 	} else {
 		if(vx<0) {
-			if(timerRun>TIMER_RUN && state==1)
-				spriteRect.left=(spriteRect.left == RUN_1_OFFSET)? RUN_2_OFFSET : RUN_1_OFFSET;
-			else if(state!=1) {
-				state=1;
-				spriteRect.left=RUN_1_OFFSET;
-			}
+			animateRun(timerRun,TIMER_RUN,1,RUN_1_OFFSET,RUN_2_OFFSET);
 			sprite.setScale(-4.f,4.f);
 		} else if(vx>0) {
-			if(timerRun>TIMER_RUN && state==1)
-				spriteRect.left=(spriteRect.left == RUN_1_OFFSET)? RUN_2_OFFSET : RUN_1_OFFSET;
-			else if(state!=1) {
-				state=1;
-				spriteRect.left=RUN_1_OFFSET;
-			}
+			animateRun(timerRun,TIMER_RUN,1,RUN_1_OFFSET,RUN_2_OFFSET);
 			sprite.setScale(4.f,4.f);
 		} else {
-			if(timerIdle>TIMER_IDLE && state==0)
-				spriteRect.left=(spriteRect.left == IDLE_1_OFFSET)? IDLE_2_OFFSET : IDLE_1_OFFSET;
-			else if(state!=0) {
-				state=0;
-				spriteRect.left=IDLE_1_OFFSET;
-			}
+			animateRun(timerIdle,TIMER_IDLE,0,IDLE_1_OFFSET,IDLE_2_OFFSET);
 		}
 	}
 	if(state!=0||timerIdle>TIMER_IDLE) timerIdle=0;

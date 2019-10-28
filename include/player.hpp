@@ -24,6 +24,7 @@
 
 class Player : public Entity {
 	public:
+		//0:idle, 1:walking, 2:jumping, need enum
 		int state;
 		float speed,vx,vy,timerIdle,timerRun,origin_x,origin_y;
 		bool chestOpened,doorOpened;
@@ -39,6 +40,7 @@ class Player : public Entity {
 		void init(float x,float y,std::string path);
 		void move(int dir,float deltaTime);
 		void setSprite(sf::Texture &t);
+		void animateRun(float t1,float t2,int s,int offset1,int offset2);
 		void animate(float timer);
 
 		~Player();

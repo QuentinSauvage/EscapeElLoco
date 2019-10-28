@@ -73,19 +73,21 @@ class GameLogic {
 		void clear();
 		void initLevel();
 		void extractMap();
+		void addModif(int x,int y,int type,int dimX,int dimY);
 		void handleEvents(float deltaTime,int keyCode);
-		void jump(std::vector<std::vector<sf::Sprite>> &gmap,float dt);
-		void handleCollisions(std::vector<std::vector<sf::Sprite>> &gmap,float dt);
+		void jump(float dt);
+		void handleCollisions(const std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		//check if the player is on a block that just reappeared, if so, move it on the closest empty tile
-		void handleCollisions2(std::vector<std::vector<sf::Sprite>> &gmap, float dt);
-		void update(float deltaTime,std::vector<std::vector<sf::Sprite>> &gmap,int keyCode);
-		void testCollisions(std::vector<std::vector<sf::Sprite>> &gmap,float dt);
+		void handleCollisions2(const std::vector<std::vector<sf::Sprite>> &gmap, float dt);
+		void update(float deltaTime,const std::vector<std::vector<sf::Sprite>> &gmap,int keyCode);
+		void testCollisions(const std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		//-1:makes the player fall, 0: the players can go through (stops the fall), 1: solid object
-		int  tileType(int tile);
-		void interact(int &indX,int &indY,float deltaTime);
+		int  tileType(int tile) const;
+		void interact(int indX,int indY,float deltaTime);
 		bool updateCoin(float deltaTime);
 		bool updateCollapseBlocks(float deltaTime);
 		bool updateTimerBlocks(float deltaTime);
+		void animateElLoco(float deltaTime);
 
 		~GameLogic();
 };

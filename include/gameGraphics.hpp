@@ -47,7 +47,7 @@ class GameGraphics {
 		void loadMap();
 		void drawBackground(int k);
 		void buildWindow();
-
+		float clamp(float v,float min,float max) const;
 		~GameGraphics();
 };
 

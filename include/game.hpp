@@ -15,10 +15,7 @@ class Game {
 		GameGraphics gameGraphics;
 
 		Game();
-
 		void run();
-		void getFramerate();
-
 		~Game();
 };
 
