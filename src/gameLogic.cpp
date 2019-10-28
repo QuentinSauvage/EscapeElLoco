@@ -6,7 +6,7 @@
 
 using namespace std;
 
-GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(2),p_index(0),pause(false),end(false) {
+GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(1),p_index(0),pause(false),end(false) {
 	initLevel();
 }
 
@@ -210,7 +210,6 @@ void GameLogic::jump(vector<vector<sf::Sprite>> &gmap,float deltaTime) {
   	}
 }
 
-//fix: collisions bug <30fps
 void GameLogic::handleCollisions(vector<vector<sf::Sprite>> &gmap,float deltaTime) {
 	float xp,xn,yp,yn;
 	int indY=players[p_index].y/TILE_DIM,indX=players[p_index].x/TILE_DIM;
@@ -246,7 +245,7 @@ void GameLogic::handleCollisions(vector<vector<sf::Sprite>> &gmap,float deltaTim
 	indY=players[p_index].y/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 	if(players[p_index].vy>=0) {
 		yn=(indY-2<0)? 0 : indY-2;
-		yp=indY+1;
+		yp=indY;
 	} else {
 		yn = indY;
 		yp = (indY+2>map.height)? map.height : indY+2;
@@ -262,6 +261,7 @@ void GameLogic::handleCollisions(vector<vector<sf::Sprite>> &gmap,float deltaTim
 			players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
 			r = players[p_index].sprite.getGlobalBounds();
 		}
+
 	if(map.map[indY+1][indX]==COLLAPSE_BLOCK) {
 		for(CollapseBlock cb : collapseBlocks[p_index])
 			if(cb.x==indY+1&&cb.y==indX)
@@ -270,31 +270,50 @@ void GameLogic::handleCollisions(vector<vector<sf::Sprite>> &gmap,float deltaTim
 }
 
 void GameLogic::handleCollisions2(vector<vector<sf::Sprite>> &gmap, float deltaTime) {
-	int indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
+	int indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM,i=1;
 	sf::FloatRect rect;
 	if(map.collisions[indY][indX]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][indX].getGlobalBounds(),rect))) {
-		int i=1;
 		bool move;
 		while(true) {
 			if(indX-i&&map.collisions[indY][indX-i]<=0) {
-				players[p_index].x-=rect.width;
+				players[p_index].x-=(rect.width+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
 				move=true;
-			}
+			} else
 			if(indX+i<map.width&&map.collisions[indY][indX+i]<=0) {
-				players[p_index].x+=rect.width;
+				players[p_index].x+=(rect.width+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
 				move=true;
-			}
+			} else
 			if(indY-i&&map.collisions[indY-i][indX]<=0) {
-				players[p_index].y+=rect.height;
+				players[p_index].y+=(rect.height+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
 				move=true;
-			}
+			} else
 			if(indY+i<map.height&&map.collisions[indY+i][indX]<=0) {
-				players[p_index].y-=rect.height;
+				players[p_index].y-=(rect.height+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
+				move=true;
+			} else
+			if(indX-i&&indY-i&&map.collisions[indY-i][indX-i]<=0) {
+				players[p_index].x-=(rect.width+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
+				players[p_index].y-=(rect.height+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
+				move=true;
+			} else
+			if(indX+i<map.width&&indY+i<map.height&&map.collisions[indY+i][indX+i]<=0) {
+				players[p_index].x+=(rect.width+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
+				players[p_index].y+=(rect.height+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
+				move=true;
+			} else
+			if(indX+i<map.width&&indY-i&&map.collisions[indY-i][indX+i]<=0) {
+				players[p_index].x+=(rect.width+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
+				players[p_index].y-=(rect.height+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
+				move=true;
+			} else
+			if(indX-i&&indY+i<map.height&&map.collisions[indY+i][indX-i]<=0) {
+				players[p_index].x-=(rect.width+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
+				players[p_index].y+=(rect.height+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
 				move=true;
 			}
 			if(move) {
 				indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
-				if(map.collisions[indY][indX]<=0) break;
+				break;
 				move=false;
 			}
 			++i;

@@ -17,7 +17,7 @@
 #define RIGHT_CENTER_X 2112
 #define CENTER_Y 1408
 #define FRAMERATE_FONT_SIZE 24
-#define FRAMERATE 25
+#define FRAMERATE 60
 #define TILE_DIM 64
 #define EMPTY 98
 
