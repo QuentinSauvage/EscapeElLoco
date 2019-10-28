@@ -84,18 +84,34 @@ void GameGraphics::checkUpdate() {
 
 //Each view only draw their part of the screen
 void GameGraphics::drawBackground(int k) {
-    int begin,end;
+    int y1,y2,x1,x2,limitX1,limitX2;
+    Vector2f center, size;
+    View view;
+
     if(k) {
-        begin=screenLimit;
-        end=gameLogic.map.width;
+        view=viewRight;
+        limitX1=screenLimit;
+        limitX2=gameLogic.map.width;
     } else {
-        begin=0;
-        end=screenLimit;
+        view=viewLeft;
+        limitX1=0;
+        limitX2=screenLimit;
     }
-    for(int i=0;i<gameLogic.map.height;i++)
-        for(int j=begin;j<end;j++) {
+    
+    center=view.getCenter();
+    size=view.getSize();
+    x1=(view.getCenter().x-view.getSize().x)/64;
+    x2=(view.getCenter().x+view.getSize().x)/64;
+    y1=(view.getCenter().y-view.getSize().y)/64;
+    y2=(view.getCenter().y+view.getSize().y)/64;
+    if(x1<limitX1) x1=limitX1;
+    if(x2>limitX2) x2=limitX2;
+    if(y1<0) y1=0;
+    if(y2>gameLogic.map.height) y2=gameLogic.map.height;
+
+    for(int i=y1;i<y2;i++)
+        for(int j=x1;j<x2;j++)
             window.draw(map[i][j]);
-        }
 }
 
 void GameGraphics::buildWindow() {

@@ -40,7 +40,7 @@ int GameLogic::tileType(int tile) {
 
 void GameLogic::interact(int &indX, int &indY,float deltaTime) {
 	Modif m;
-	if(map.map[indY][indX]==COIN) {
+	if(map.map[indY][indX]==COIN&&!players[p_index].coin.collected) {
 		if(players[p_index].coin.timer>0) {
 			map.map[players[p_index].coin.x][players[p_index].coin.y]=EMPTY;
 			m={(int)players[p_index].coin.y,(int)players[p_index].coin.x,EMPTY};
