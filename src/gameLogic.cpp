@@ -6,7 +6,7 @@
 
 using namespace std;
 
-GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(1),p_index(0),pause(false),end(false) {
+GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(2),p_index(0),pause(false),end(false) {
 	initLevel();
 }
 

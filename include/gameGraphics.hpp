@@ -16,10 +16,6 @@
 #define LEFT_CENTER_X 512
 #define RIGHT_CENTER_X 2112
 #define CENTER_Y 1408
-#define BOUND_MIN_Y 512
-#define BOUND_MAX_Y 1408
-#define BOUND_X1 1088
-#define BOUND_X2 2688
 #define FRAMERATE_FONT_SIZE 24
 #define FRAMERATE 60
 #define TILE_DIM 64
@@ -27,6 +23,7 @@
 
 class GameGraphics {
 	public:
+		int right_center_x,left_center_x,bound_min_y,bound_max_y,bound_x1,bound_x2;
 		GameLogic &gameLogic;
 		sf::RenderWindow window;
 		sf::Text framerateText;

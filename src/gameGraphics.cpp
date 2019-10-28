@@ -43,6 +43,13 @@ void GameGraphics::loadMap() {
         map.push_back(v);
     }
     for(int i=0;i<2;i++) gameLogic.players[i].setSprite(playersTexture[i]);
+    
+    bound_min_y=viewLeft.getSize().y/2;
+    bound_max_y=(gameLogic.map.height*64)-(viewLeft.getSize().y/2);
+    left_center_x=viewLeft.getSize().x/2;
+    right_center_x=left_center_x + ((gameLogic.map.width/2) * 64);
+    bound_x1=((gameLogic.map.width/2) * 64) - (viewLeft.getSize().x / 2);
+    bound_x2=(gameLogic.map.width*64) - (viewRight.getSize().x / 2);
 }
 
 void GameGraphics::load() {
@@ -97,6 +104,7 @@ void GameGraphics::buildWindow() {
     window.setPosition(Vector2i((screen.width>>1)-(window.getSize().x>>1),(screen.height>>1)-(window.getSize().y>>1)));
 	window.setFramerateLimit(FRAMERATE);
 
+    //default values
     viewLeft.setCenter(LEFT_CENTER_X,CENTER_Y);
     viewLeft.setViewport(FloatRect(0.f,0.f,0.498f,1.f));
     viewRight.setCenter(RIGHT_CENTER_X,CENTER_Y);
@@ -139,8 +147,8 @@ void GameGraphics::update(float deltaTime) {
     checkUpdate();
 
     //Draw
-    viewLeft.setCenter(clamp(gameLogic.players[0].x,LEFT_CENTER_X,BOUND_X1),clamp(gameLogic.players[0].y,BOUND_MIN_Y,BOUND_MAX_Y));
-    viewRight.setCenter(clamp(gameLogic.players[1].x,RIGHT_CENTER_X,BOUND_X2),clamp(gameLogic.players[1].y,BOUND_MIN_Y,BOUND_MAX_Y));
+    viewLeft.setCenter(clamp(gameLogic.players[0].x,left_center_x,bound_x1),clamp(gameLogic.players[0].y,bound_min_y,bound_max_y));
+    viewRight.setCenter(clamp(gameLogic.players[1].x,right_center_x,bound_x2),clamp(gameLogic.players[1].y,bound_min_y,bound_max_y));
     window.setView(window.getDefaultView());
     window.clear(Color::Black);    
 
