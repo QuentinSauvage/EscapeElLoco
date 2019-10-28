@@ -84,8 +84,8 @@ void GameGraphics::checkUpdate() {
 
 //Each view only draw their part of the screen
 void GameGraphics::drawBackground(int k) {
-    int y1,y2,x1,x2,limitX1,limitX2;
-    Vector2f center, size;
+    int y1,y2,x1,x2,limitX1,limitX2,sizeX,sizeY;
+    Vector2f center;
     View view;
 
     if(k) {
@@ -97,13 +97,14 @@ void GameGraphics::drawBackground(int k) {
         limitX1=0;
         limitX2=screenLimit;
     }
-    
+
     center=view.getCenter();
-    size=view.getSize();
-    x1=(view.getCenter().x-view.getSize().x)/64;
-    x2=(view.getCenter().x+view.getSize().x)/64;
-    y1=(view.getCenter().y-view.getSize().y)/64;
-    y2=(view.getCenter().y+view.getSize().y)/64;
+    sizeY=view.getSize().x/2;
+    sizeX=view.getSize().y/2;
+    x1=(((int)(center.x-sizeX))>>6)-1;
+    x2=(((int)(center.x+sizeX))>>6)+1;
+    y1=(((int)(center.y-sizeY))>>6)-1;
+    y2=(((int)(center.y+sizeY))>>6)+1;
     if(x1<limitX1) x1=limitX1;
     if(x2>limitX2) x2=limitX2;
     if(y1<0) y1=0;
