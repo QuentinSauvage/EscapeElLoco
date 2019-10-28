@@ -62,8 +62,8 @@ void Player::animate(float timer) {
 			}
 		}
 	}
-	if(state!=0 || timerIdle>TIMER_IDLE) timerIdle=0;
-	if(state!=1 || timerRun>TIMER_RUN) timerRun=0;
+	if(state!=0||timerIdle>TIMER_IDLE) timerIdle=0;
+	if(state!=1||timerRun>TIMER_RUN) timerRun=0;
 	sprite.setTextureRect(spriteRect);
 }
 

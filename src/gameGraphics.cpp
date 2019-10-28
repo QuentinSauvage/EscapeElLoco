@@ -22,8 +22,8 @@ void GameGraphics::loadMap() {
     }
 
     sf::Sprite s;
+    map.emplace_back();
     for(int i=0; i<gameLogic.map.height;i++) {
-        std::vector<Sprite> v;
         for(int j=0; j<gameLogic.map.width;j++) {
             s.setTexture(background);
             int tileNumber=gameLogic.map.map[i][j];
@@ -38,9 +38,9 @@ void GameGraphics::loadMap() {
                 s.setPosition(j<<6,i<<6);
             }
             s.setScale(4.f,4.f);
-            v.push_back(s);
+            map.back().push_back(s);
         }
-        map.push_back(v);
+        map.emplace_back();
     }
     for(int i=0;i<2;i++) gameLogic.players[i].setSprite(playersTexture[i]);
     
@@ -73,12 +73,14 @@ void GameGraphics::load() {
 
 void GameGraphics::checkUpdate() {
     if(gameLogic.end) {
-        std::cout << "gameLogic.end" << std::endl;
         gameLogic.end=false;
         reinit();
     } else {
-        for(size_t i=0;i<gameLogic.modifs.size();i++)
-            map[gameLogic.modifs[i].y][gameLogic.modifs[i].x].setTextureRect(IntRect((gameLogic.modifs[i].value%8)<<4,(gameLogic.modifs[i].value>>3)<<4,16,16));
+        GameLogic::Modif m;
+        for(size_t i=0;i<gameLogic.modifs.size();i++) {
+            m=gameLogic.modifs[i];
+            map[m.y][m.x].setTextureRect(IntRect((m.value%8)<<4,(m.value>>3)<<4,m.w,m.h));
+        }
     }
 }
 

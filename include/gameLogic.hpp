@@ -54,7 +54,7 @@ class GameLogic {
 			std::vector<std::vector<int>> collisions;
 		};
 		struct Modif {
-			int x,y,value;
+			int x,y,value,w,h;
 		};
 		GameAudio &gameAudio;
 		int level,p_index;
