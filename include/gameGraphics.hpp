@@ -20,10 +20,12 @@
 #define FRAMERATE 60
 #define TILE_DIM 64
 #define EMPTY 98
+#define ROTATION 25
 
 class GameGraphics {
 	public:
 		int right_center_x,left_center_x,bound_min_y,bound_max_y,bound_x1,bound_x2;
+		bool hardcoreMode;
 		GameLogic &gameLogic;
 		sf::RenderWindow window;
 		sf::Text framerateText;
@@ -35,7 +37,7 @@ class GameGraphics {
     	std::vector<std::vector<sf::Sprite>> map;
     	sf::View viewLeft, viewRight;
     	sf::RectangleShape border;
-		float framerate,blinkTime;
+		float framerate,blinkTime,rotation;
 		int screenLimit;
 		
 		GameGraphics(GameLogic &gl);

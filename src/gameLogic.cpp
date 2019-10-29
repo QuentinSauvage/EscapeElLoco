@@ -23,8 +23,11 @@ void GameLogic::clear() {
 }
 
 void GameLogic::initLevel() {
+	if(level>2) {
+		cout << "Congratulations!! You managed to escape El Loco's Tower! But beware, he may return..." << endl;
+	}
 	timer=timerElLoco=0;
-	godMode=interactEvent=timerBlocksDisplayed=elLocoDisplayed=false;
+	godMode=hardcoreMode=interactEvent=timerBlocksDisplayed=elLocoDisplayed=false;
 	extractMap();
 }
 
@@ -103,6 +106,7 @@ void GameLogic::extractMap() {
 		levelMap >> posX1 >> c >> posY1 >> c;
 		levelMap >> posX2 >> c >> posY2 >> c;
 		int sep=map.width>>1;
+		if(level==2) sep++;//level2 doesn't divide the map in two equal parts
 		map.map.emplace_back();
 		map.collisions.emplace_back();
 		for(int i=0;i<map.height;i++) {
@@ -171,6 +175,7 @@ void GameLogic::handleEvents(float deltaTime,int keyCode) {
 		}
 		if(keyCode==sf::Keyboard::A) gameAudio.changeState();
 		if(keyCode==sf::Keyboard::G) godMode=!godMode;
+		if(keyCode==sf::Keyboard::H) hardcoreMode=!hardcoreMode;
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
 			climbing=true;
 			interactEvent = true;

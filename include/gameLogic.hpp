@@ -59,7 +59,7 @@ class GameLogic {
 		GameAudio &gameAudio;
 		int level,p_index;
 		float timer,timerElLoco;
-		bool godMode,pause,interactEvent,timerBlocksDisplayed,climbing,end,elLocoDisplayed;
+		bool godMode,hardcoreMode,pause,interactEvent,timerBlocksDisplayed,climbing,end,elLocoDisplayed;
 		Map map;
 		std::vector<Modif> modifs;
 		std::vector<TimerBlock> timerBlocks;

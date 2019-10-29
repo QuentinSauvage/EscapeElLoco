@@ -4,7 +4,7 @@
 
 using namespace sf;
 
-GameGraphics::GameGraphics(GameLogic &gl) : gameLogic(gl) {
+GameGraphics::GameGraphics(GameLogic &gl) : hardcoreMode(false),gameLogic(gl),rotation(0) {
 	init();
 }
 
@@ -77,6 +77,7 @@ void GameGraphics::load() {
 void GameGraphics::checkUpdate() {
     if(gameLogic.end) {
         gameLogic.end=false;
+        rotation=0;
         reinit();
     } else {
         GameLogic::Modif m;
@@ -169,6 +170,20 @@ void GameGraphics::update(float deltaTime) {
 	framerate=1.f/(deltaTime);
 	framerateText.setString(std::to_string((int)ceil(framerate))+" fps");    
     
+    if(hardcoreMode!=gameLogic.hardcoreMode) {
+        if(hardcoreMode) {
+            rotation=0;
+            viewLeft.setRotation(0);
+            viewRight.setRotation(0);
+        }
+        hardcoreMode=!hardcoreMode;
+    }
+    if(hardcoreMode) {
+        viewLeft.setRotation(-rotation);
+        viewRight.setRotation(rotation);
+        rotation+=ROTATION*deltaTime;
+    }
+
     checkUpdate();
 
     //Draw
