@@ -21,6 +21,7 @@ class GameAudio {
 		GameAudio();
 		void load();
         void changeState();
+		void playSound(sf::Sound &sound);
 		~GameAudio();
 };
 

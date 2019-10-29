@@ -6,7 +6,7 @@
 
 using namespace std;
 
-GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(1),p_index(0),pause(false),end(false) {
+GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(2),p_index(0),pause(false),end(false) {
 	initLevel();
 }
 
@@ -28,7 +28,10 @@ void GameLogic::initLevel() {
 	extractMap();
 }
 
-//enlever utilisation de vecteurs temporaires (aussi dans gameGraphics)
+void GameLogic::addModif(int indX,int indY,int value) {
+	map.map[indY][indX]=value;
+	modifs.push_back({indX,indY,value,16,16});
+}
 
 int GameLogic::tileType(int tile) const {
 	if(tile==EMPTY||tile==COIN||tile==CHAIR_L||tile==CHAIR_R||tile==BOUQUET||
@@ -38,68 +41,45 @@ int GameLogic::tileType(int tile) const {
 }
 
 void GameLogic::interact(int indX, int indY,float deltaTime) {
-	Modif m;
 	if(map.map[indY][indX]==COIN&&!players[p_index].coin.collected) {
+		Coin &coin=players[p_index].coin;
 		if(players[p_index].coin.timer>0) {
-			map.map[players[p_index].coin.x][players[p_index].coin.y]=EMPTY;
-			m={(int)players[p_index].coin.y,(int)players[p_index].coin.x,EMPTY,16,16};
-			modifs.push_back(m);
-			players[p_index].coin.timer=0;
+			addModif(coin.y,coin.x,EMPTY);
+			coin.timer=0;
 		}
 		if(gameAudio.playing) gameAudio.timer.play();
-		players[p_index].coin.x=indX;
-		players[p_index].coin.y=indY;
-		players[p_index].coin.collected=true;
-		map.map[indY][indX]=EMPTY;
-		m={indX,indY,EMPTY,16,16};
-		modifs.push_back(m);
+		coin = Coin(indX,indY,1,0,true);
+		addModif(indX,indY,EMPTY);
 		int x,y,other=(p_index+1)%2;
 		size_t size=players[other].coinBlocks.size();
 		for(size_t i=0;i<size;i++) {
 			x=players[other].coinBlocks[i].x;
 			y=players[other].coinBlocks[i].y;
-			map.map[x][y]=EMPTY;
+			addModif(y,x,EMPTY);
 			map.collisions[x][y]=-1;
-			m={y,x,EMPTY,16,16};
-			modifs.push_back(m);
 		}
 	} else if(map.map[indY][indX]==LADDER||map.map[indY+1][indX]==LADDER||map.map[indY][indX]==ROPE||
 			map.map[indY+1][indX]==ROPE||map.map[indY][indX]==ROPE_END||map.map[indY+1][indX]==ROPE_END) {
-		players[p_index].vy=0;
-		players[p_index].state=2;
 		float tmp=players[p_index].y;
-
-		if(climbing) players[p_index].y-=players[p_index].speed*deltaTime;
-		else players[p_index].y+=players[p_index].speed*deltaTime;
+		players[p_index].climb(climbing,deltaTime);
 		int y=(players[p_index].y-OFFSET)/TILE_DIM;
 		if(map.collisions[y][indX]>0) players[p_index].y=tmp;
-		else indY=y;
 	} else if(map.map[indY][indX]==KEY) {
-		players[p_index].key.collected=true;
-		map.map[players[p_index].key.x][players[p_index].key.y]=EMPTY;
-		m={(int)players[p_index].key.y,(int)players[p_index].key.x,EMPTY,16,16};
-		modifs.push_back(m);
+		Key &key=players[p_index].key;
+		key.collected=true;
+		addModif(key.y,key.x,EMPTY);
 	} else if((map.map[indY][indX]==CHEST_L||map.map[indY][indX]==CHEST_R)&&!players[p_index].chestOpened) {
 		players[p_index].chestOpened=true;
-		map.map[players[p_index].key.x][players[p_index].key.y]=KEY;
-		m={(int)players[p_index].key.y,(int)players[p_index].key.x,KEY,16,16};
-		modifs.push_back(m);
+		Key &key=players[p_index].key;
+		addModif(key.y,key.x,KEY);
 	} else if((map.map[indY][indX]==DOOR_TC||map.map[indY][indX]==DOOR_BC)&&players[p_index].key.collected) {
 		players[p_index].doorOpened=true;
 		if(map.map[indY][indX]==DOOR_TC) {
-			map.map[indY][indX]=DOOR_TO;
-			map.map[indY+1][indX]=DOOR_BO;
-			m={indX,indY,DOOR_TO,16};
-			modifs.push_back(m);
-			m={indX,indY+1,DOOR_BO,16,16};
-			modifs.push_back(m);
+			addModif(indX,indY,DOOR_TO);
+			addModif(indX,indY+1,DOOR_BO);
 		} else {
-			map.map[indY][indX]=DOOR_BO;
-			map.map[indY-1][indX]=DOOR_BO;
-			m={indX,indY-1,DOOR_TO,16,16};
-			modifs.push_back(m);
-			m={indX,indY,DOOR_BO,16,16};
-			modifs.push_back(m);
+			addModif(indX,indY,DOOR_BO);
+			addModif(indX,indY-1,DOOR_TO);
 		}
 		if(players[(p_index+1)%2].doorOpened) {
 			clear();
@@ -174,12 +154,12 @@ void GameLogic::handleEvents(float deltaTime,int keyCode) {
 			if(godMode||players[0].state!=2) {
 				players[0].vy=JUMP_VELOCITY;
 				players[0].state=2;
-				if(gameAudio.playing) gameAudio.jumpSoundLeft.play();
+				gameAudio.playSound(gameAudio.jumpSoundLeft);
 			}
 			if(godMode||players[1].state!=2) {
 				players[1].vy=JUMP_VELOCITY;
 				players[1].state=2;
-				if(gameAudio.playing) gameAudio.jumpSoundRight.play();
+				gameAudio.playSound(gameAudio.jumpSoundRight);
 			}
 		}
 		if(keyCode==sf::Keyboard::R) {
@@ -322,23 +302,20 @@ void GameLogic::handleCollisions2(const vector<vector<sf::Sprite>> &gmap, float 
 }
 
 bool GameLogic::updateCoin(float deltaTime) {
-	if(players[p_index].coin.collected) {
-		players[p_index].coin.timer+=deltaTime;
-		if(players[p_index].coin.timer>COIN_BLOCK_TIMER) {
-			Modif m={(int)players[p_index].coin.x,(int)players[p_index].coin.y,COIN,16,16};
-			modifs.push_back(m);
-			map.map[players[p_index].coin.y][players[p_index].coin.x]=COIN;
-			players[p_index].coin.timer=0;
-			players[p_index].coin.collected=false;
+	Coin &coin=players[p_index].coin;
+	if(coin.collected) {
+		coin.timer+=deltaTime;
+		if(coin.timer>COIN_BLOCK_TIMER) {
+			addModif(coin.x,coin.y,COIN);
+			coin.timer=0;
+			coin.collected=false;
 			int x,y,other=(p_index+1)%2;
 			size_t size=players[other].coinBlocks.size();
 			for(size_t i=0;i<size;i++) {
 				x=players[other].coinBlocks[i].x;
 				y=players[other].coinBlocks[i].y;
-				map.map[x][y]=COIN_BLOCK;
 				map.collisions[x][y]=1;
-				m={y,x,COIN_BLOCK,16,16};
-				modifs.push_back(m);
+				addModif(y,x,COIN_BLOCK);
 			}
 			return true;
 		}
@@ -352,17 +329,13 @@ bool GameLogic::updateCollapseBlocks(float deltaTime) {
 		if(it->displayed&&it->timer>COLLAPSE_BLOCK_TIMER_1) {
 			it->displayed=false;
 			it->timer=0;
-			map.map[it->x][it->y]=EMPTY;
+			addModif(it->y,it->x,EMPTY);
 			map.collisions[it->x][it->y]=-1;
-			Modif m={(int)it->y,(int)it->x,EMPTY,16,16};
-			modifs.push_back(m);
 		} else if(!it->displayed&&it->timer>COLLAPSE_BLOCK_TIMER_2) {
 			it->timer=0;
 			collapsingBlocks.erase(it);
-			map.map[it->x][it->y]=COLLAPSE_BLOCK;
+			addModif(it->y,it->x,COLLAPSE_BLOCK);
 			map.collisions[it->x][it->y]=1;
-			Modif m={(int)it->y,(int)it->x,COLLAPSE_BLOCK,16,8};
-			modifs.push_back(m);
 			return true;
 		}
 	}
@@ -380,10 +353,8 @@ bool GameLogic::updateTimerBlocks(float deltaTime) {
 		for(size_t i=0;i<size;i++) {
 			x=timerBlocks[i].x;
 			y=timerBlocks[i].y;
-			map.map[x][y]=blockValue;
+			addModif(y,x,blockValue);
 			map.collisions[x][y]=(blockValue==TIMER_BLOCK)? 1:-1;
-			Modif m={y,x,blockValue,16,16};
-			modifs.push_back(m);
 		}
 		return true;
 	}

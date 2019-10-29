@@ -22,6 +22,11 @@ void GameAudio::load() {
     }
 }
 
+void GameAudio::playSound(sf::Sound &sound) {
+    if(playing&&sound.getStatus()!=Sound::Playing)
+        sound.play();
+}
+
 void GameAudio::changeState() {
     playing=!playing;
     if(!playing) music.stop();

@@ -42,6 +42,7 @@ class Player : public Entity {
 		void setSprite(sf::Texture &t);
 		void animateRun(float t1,float t2,int s,int offset1,int offset2);
 		void animate(float timer);
+		void climb(bool climbing,float deltaTime);
 
 		~Player();
 };

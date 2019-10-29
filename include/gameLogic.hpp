@@ -88,7 +88,7 @@ class GameLogic {
 		bool updateCollapseBlocks(float deltaTime);
 		bool updateTimerBlocks(float deltaTime);
 		void animateElLoco(float deltaTime);
-
+		void addModif(int indX,int indY,int value);
 		~GameLogic();
 };
 

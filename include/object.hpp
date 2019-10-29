@@ -8,7 +8,7 @@ class Coin : public Entity {
 		float timer;
 		bool collected;
 		Coin();
-		Coin(float x,float y,float s,float r);
+		Coin(float x,float y,float s,float r,bool b);
 		~Coin();
 };
 

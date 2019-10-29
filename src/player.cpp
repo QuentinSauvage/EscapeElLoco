@@ -58,6 +58,13 @@ void Player::animate(float timer) {
 	sprite.setTextureRect(spriteRect);
 }
 
+void Player::climb(bool climbing,float deltaTime) {
+	vy=0;
+	state=2;
+	if(climbing) y-=speed*deltaTime;
+	else y+=speed*deltaTime;
+}
+
 void Player::move(int dir,float deltaTime) {
 	vx=dir;
 	x+=dir*speed*deltaTime;
