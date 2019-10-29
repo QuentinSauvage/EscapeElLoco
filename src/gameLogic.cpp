@@ -78,6 +78,7 @@ void GameLogic::interact(int indX, int indY,float deltaTime) {
 		players[p_index].chestOpened=true;
 		Key &key=players[p_index].key;
 		addModif(key.y,key.x,KEY);
+		gameAudio.playSound(gameAudio.chest);
 	} else if((map.map[indY][indX]==DOOR_TC||map.map[indY][indX]==DOOR_BC)&&players[p_index].key.collected) {
 		players[p_index].doorOpened=true;
 		if(map.map[indY][indX]==DOOR_TC) {
@@ -227,7 +228,10 @@ void GameLogic::handleCollisions(const vector<vector<sf::Sprite>> &gmap,float de
 	//collision on x-axis
 	for(;xn<xp;xn++)
 		if(map.collisions[indY][xn]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][xn].getGlobalBounds(),rect))) {
-			if(rect.left>r.left) players[p_index].x-=rect.width;
+			if(map.map[indY][xn]==COLLAPSE_BLOCK) {
+
+			}
+			else if(rect.left>r.left) players[p_index].x-=rect.width;
 			else players[p_index].x+=rect.width;
 			players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
 			break;
@@ -251,7 +255,7 @@ void GameLogic::handleCollisions(const vector<vector<sf::Sprite>> &gmap,float de
 				players[p_index].y-=rect.height;
 				players[p_index].state=(players[p_index].vx!=0)? 1 : 0;
 				players[p_index].spriteRect.left=IDLE_1_OFFSET;
-			} else players[p_index].y+=rect.height;
+			} else if(map.map[yn][indX]!=COLLAPSE_BLOCK) players[p_index].y+=rect.height;
 			players[p_index].vy=0;
 			players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
 			r = players[p_index].sprite.getGlobalBounds();
@@ -347,9 +351,9 @@ bool GameLogic::updateCollapseBlocks(float deltaTime) {
 			map.collisions[it->x][it->y]=-1;
 		} else if(!it->displayed&&it->timer>COLLAPSE_BLOCK_TIMER_2) {
 			it->timer=0;
-			collapsingBlocks.erase(it);
 			addModif(it->y,it->x,COLLAPSE_BLOCK);
 			map.collisions[it->x][it->y]=1;
+			collapsingBlocks.erase(it);
 			return true;
 		}
 	}

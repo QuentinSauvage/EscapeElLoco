@@ -5,13 +5,10 @@
 #include <vector>
 #include "gameLogic.hpp"
 
-
+#define LOAD_GRAPHICS_ERROR "Error when loading: "
 #define LOAD_TILESET "sprites/tileset1.png"
 #define LOAD_EL_LOCO "sprites/elLoco.png"
-#define LOAD_TILESET_ERROR "Error when loading map tileset"
 #define LOAD_FONT "fonts/mismo/Mismo Black.ttf"
-#define LOAD_FONT_ERROR "Error when loading Mismo Black.ttf"
-#define EL_LOCO_ERROR "Error when loading El Loco"
 #define TITLE "Escape El Loco"
 #define LEFT_CENTER_X 512
 #define RIGHT_CENTER_X 2112

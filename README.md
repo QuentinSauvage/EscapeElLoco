@@ -37,8 +37,9 @@ make && ./app
 ```
 
 # Arts
-Music : https://freesound.org/people/envirOmaniac2/sounds/376454/
-Jump : https://freesound.org/people/OwlStorm/sounds/404793/
-Timer : The Legend of Zelda - Ocarina of Time (Nintendo)
-Dino characters : https://arks.itch.io/dino-characters
-Tileset : https://rottingpixels.itch.io/castle-platformer-tileset-16x16free
+Music: https://freesound.org/people/envirOmaniac2/sounds/376454/
+Jump audio: https://freesound.org/people/OwlStorm/sounds/404793/
+Chest audio: https://freesound.org/people/ssierra1202/sounds/391947/
+Timer: The Legend of Zelda - Ocarina of Time (Nintendo)
+Dino characters: https://arks.itch.io/dino-characters
+Tileset: https://rottingpixels.itch.io/castle-platformer-tileset-16x16free

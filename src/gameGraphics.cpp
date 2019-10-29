@@ -13,11 +13,11 @@ void GameGraphics::loadMap() {
     if(!(gameLogic.level%2)) sprite1=PLAYER1_SPRITE,sprite2=PLAYER2_SPRITE;
     else sprite1=PLAYER3_SPRITE,sprite2=PLAYER4_SPRITE;
     if(!playersTexture[0].loadFromFile(sprite1)) {
-        std::cerr << LOAD_PLAYER_SPRITE_ERROR << std::endl;
+        std::cerr << LOAD_GRAPHICS_ERROR << sprite1 << std::endl;
         exit(1);
     }
     if(!playersTexture[1].loadFromFile(sprite2)) {
-        std::cerr << LOAD_PLAYER_SPRITE_ERROR << std::endl;
+        std::cerr << LOAD_GRAPHICS_ERROR << sprite2 << std::endl;
         exit(1);
     }
 
@@ -57,15 +57,15 @@ void GameGraphics::loadMap() {
 
 void GameGraphics::load() {
     if(!background.loadFromFile(LOAD_TILESET)) {
-        std::cerr << LOAD_TILESET_ERROR << std::endl;
+        std::cerr << LOAD_GRAPHICS_ERROR << LOAD_TILESET << std::endl;
         exit(1);
     }
     if(!font.loadFromFile(LOAD_FONT)) {
-        std::cerr << LOAD_FONT_ERROR << std::endl;
+        std::cerr << LOAD_GRAPHICS_ERROR << LOAD_FONT << std::endl;
         return;
     }
     if(!elLocoTexture.loadFromFile(LOAD_EL_LOCO)) {
-        std::cerr << EL_LOCO_ERROR << std::endl;
+        std::cerr << LOAD_GRAPHICS_ERROR << LOAD_EL_LOCO << std::endl;
         exit(1);
     }
     elLocoSprite.setTexture(elLocoTexture);
