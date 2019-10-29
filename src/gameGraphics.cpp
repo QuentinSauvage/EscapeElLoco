@@ -4,7 +4,7 @@
 
 using namespace sf;
 
-GameGraphics::GameGraphics(GameLogic &gl) : hardcoreMode(false),gameLogic(gl),rotation(0) {
+GameGraphics::GameGraphics(GameLogic &gl) : hardcoreMode(false),end(false),gameLogic(gl),rotation(0) {
 	init();
 }
 
@@ -166,7 +166,44 @@ float GameGraphics::clamp(float v,float min,float max) const {
     return v; 
 }
 
+void GameGraphics::displayEndGame() {
+    window.setView(window.getDefaultView());
+    window.clear(Color::White);
+    sf::Text endText;
+    endText.setFont(font);
+    endText.setCharacterSize(END_FONT_SIZE);
+    endText.setFillColor(Color::Black);
+    endText.setOutlineThickness(1);
+    endText.setOutlineColor(Color::Yellow);
+    endText.setPosition(100,100);
+    endText.setString(END_TEXT); 
+    window.draw(endText);
+
+    sf::Text thanksText;
+    thanksText.setFont(font);
+    thanksText.setCharacterSize(THANKS_FONT_SIZE);
+    thanksText.setFillColor(Color::Black);
+    thanksText.setOutlineThickness(1);
+    thanksText.setOutlineColor(Color::Yellow);
+    thanksText.setPosition(window.getSize().x-500,window.getSize().y-100);
+    thanksText.setString(THANKS_TEXT);
+    window.draw(thanksText);
+
+    elLocoSprite.setScale(4.0f,4.0f);
+    elLocoSprite.setPosition(window.getSize().x>>1,window.getSize().y-300);
+    window.draw(elLocoSprite);
+
+    window.display();
+}
+
 void GameGraphics::update(float deltaTime) {
+    if(gameLogic.level>2) {
+        if(!end) {
+            end=true;
+            displayEndGame();
+        }
+        return;
+    }
 	framerate=1.f/(deltaTime);
 	framerateText.setString(std::to_string((int)ceil(framerate))+" fps");    
     

@@ -21,13 +21,19 @@ void GameLogic::clear() {
 	collapseBlocks[1].clear();
 	collapsingBlocks.clear();
 	gameAudio.timer.stop();
+	players[0].chestOpened=false;
+	players[0].doorOpened=false;
 	players[0].coinBlocks.clear();
 	players[1].coinBlocks.clear();
+	players[1].chestOpened=false;
+	players[1].doorOpened=false;
 }
 
 void GameLogic::initLevel() {
 	if(level>2) {
-		cout << "Congratulations!! You managed to escape El Loco's Tower! But beware, he may return..." << endl;
+		gameAudio.timer.stop();
+		gameAudio.music.stop();
+		return;
 	}
 	timer=timerElLoco=0;
 	godMode=hardcoreMode=interactEvent=timerBlocksDisplayed=elLocoDisplayed=false;

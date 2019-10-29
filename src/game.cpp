@@ -15,7 +15,7 @@ void Game::run() {
     Event event;
     gameAudio.load();
     int keyCode;
-    while(gameGraphics.window.isOpen())
+    while(gameGraphics.window.isOpen()&&gameLogic.level<=2)
     {
         keyCode=-1;
         while(gameGraphics.window.pollEvent(event)) {
@@ -31,6 +31,13 @@ void Game::run() {
         
         deltaTime=clock.getElapsedTime().asSeconds();
         clock.restart();
+    }
+    while(gameGraphics.window.isOpen())
+    {
+        while(gameGraphics.window.pollEvent(event))
+            if(event.type==Event::Closed)
+                gameGraphics.window.close();
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) break;
     }
 }
 
