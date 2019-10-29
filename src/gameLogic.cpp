@@ -238,9 +238,9 @@ void GameLogic::handleCollisions(const vector<vector<sf::Sprite>> &gmap,float de
 	indY=players[p_index].y/TILE_DIM,indX=players[p_index].x/TILE_DIM;
 	if(players[p_index].vy>=0) {
 		yn=(indY-2<0)? 0 : indY-2;
-		yp=indY;
+		yp=indY+1;
 	} else {
-		yn = indY;
+		yn = indY-1;
 		yp = (indY+2>map.height)? map.height : indY+2;
 	}
 
