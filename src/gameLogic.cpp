@@ -20,6 +20,9 @@ void GameLogic::clear() {
 	collapseBlocks[0].clear();
 	collapseBlocks[1].clear();
 	collapsingBlocks.clear();
+	gameAudio.timer.stop();
+	players[0].coinBlocks.clear();
+	players[1].coinBlocks.clear();
 }
 
 void GameLogic::initLevel() {
