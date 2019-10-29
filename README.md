@@ -12,6 +12,8 @@ _A_ : Stop audio.
 
 _R_ : Reset positions of the dragons (other properties such as collected keys will not change).
 
+_H_ : Hardcore mode, if the game is too easy.
+
 _Escape_ : Exit the game.
 
 # Goals

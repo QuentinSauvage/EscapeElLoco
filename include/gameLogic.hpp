@@ -45,6 +45,11 @@
 #define PLAYER4_SPRITE "sprites/dino/4.png"
 #define TIMER_EL_LOCO_1 10.0f
 #define TIMER_EL_LOCO_2 10.4f
+#define CHEAT_MESSAGE "You cheated not only the game, but yourself.\n\n\
+You didn't grow.\nYou didn't improve.\nYou took a shortcut and gained nothing.\n\n\
+You experienced a hollow victory.\n\
+Nothing was risked and nothing was gained.\n\n\
+It's sad that you don't know the difference."
 
 class GameLogic {
 	public:
@@ -59,7 +64,7 @@ class GameLogic {
 		GameAudio &gameAudio;
 		int level,p_index;
 		float timer,timerElLoco;
-		bool godMode,hardcoreMode,pause,interactEvent,timerBlocksDisplayed,climbing,end,elLocoDisplayed;
+		bool godMode,hardcoreMode,pause,interactEvent,timerBlocksDisplayed,climbing,end,elLocoDisplayed,cheating;
 		Map map;
 		std::vector<Modif> modifs;
 		std::vector<TimerBlock> timerBlocks;

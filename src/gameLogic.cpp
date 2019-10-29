@@ -6,7 +6,7 @@
 
 using namespace std;
 
-GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(2),p_index(0),pause(false),end(false) {
+GameLogic::GameLogic(GameAudio &audio) : gameAudio(audio),level(2),p_index(0),pause(false),end(false),cheating(false) {
 	initLevel();
 }
 
@@ -174,7 +174,13 @@ void GameLogic::handleEvents(float deltaTime,int keyCode) {
 			players[0].state=players[1].state=0;
 		}
 		if(keyCode==sf::Keyboard::A) gameAudio.changeState();
-		if(keyCode==sf::Keyboard::G) godMode=!godMode;
+		if(keyCode==sf::Keyboard::G) {
+			if(!cheating) {
+				cheating=true;
+				cout << CHEAT_MESSAGE << endl;
+			}
+			godMode=!godMode;
+		}
 		if(keyCode==sf::Keyboard::H) hardcoreMode=!hardcoreMode;
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
 			climbing=true;
