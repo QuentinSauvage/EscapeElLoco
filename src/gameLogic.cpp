@@ -72,7 +72,7 @@ void GameLogic::interact(int indX, int indY,float deltaTime) {
 			map.map[indY+1][indX]==ROPE||map.map[indY][indX]==ROPE_END||map.map[indY+1][indX]==ROPE_END) {
 		float tmp=players[p_index].y;
 		players[p_index].climb(climbing,deltaTime);
-		int y=(players[p_index].y-OFFSET)/TILE_DIM;
+		int y=(players[p_index].y)/TILE_DIM;
 		if(map.collisions[y][indX]>0) players[p_index].y=tmp;
 	} else if(map.map[indY][indX]==KEY) {
 		Key &key=players[p_index].key;
@@ -82,11 +82,11 @@ void GameLogic::interact(int indX, int indY,float deltaTime) {
 		Key &key=players[p_index].key;
 		addModif(key.y,key.x,KEY);
 		if(map.map[indY][indX]==CHEST_LC) {
-			cout << "left" << endl;
 			addModif(indX,indY,CHEST_LO);
-			addModif(indX+1,indY,CHEST_RO);
+			if(map.map[indY][indX+1]==CHEST_RC)
+				addModif(indX+1,indY,CHEST_RO);
 		} else {
-			cout << "right" << endl;
+			if(map.map[indY][indX-1]==CHEST_LC)
 			addModif(indX-1,indY,CHEST_LO);
 			addModif(indX,indY,CHEST_RO);
 		}
@@ -217,117 +217,85 @@ void GameLogic::jump(float deltaTime) {
 }
 
 void GameLogic::handleCollisions(const vector<vector<sf::Sprite>> &gmap,float deltaTime) {
-	float xp,xn,yp,yn;
-	int indY=players[p_index].y/TILE_DIM,indX=players[p_index].x/TILE_DIM;
+	int centerX,centerY,top,down,left,right;
+	centerX=(players[p_index].x)/TILE_DIM;
+	centerY=(players[p_index].y)/TILE_DIM;
+	top=(players[p_index].y-PLAYER_DIM_SCALED)/TILE_DIM;
+	down=(players[p_index].y+PLAYER_DIM_SCALED)/TILE_DIM;
+	left=(players[p_index].x-PLAYER_DIM_SCALED)/TILE_DIM;
+	right=(players[p_index].x+PLAYER_DIM_SCALED)/TILE_DIM;
 	sf::FloatRect rect,r=players[p_index].sprite.getGlobalBounds();
 
-	if(interactEvent) interact(indX,indY,deltaTime);
-
-	if(players[p_index].state!=2&&map.collisions[indY+1][indX]==-1) {
-		players[p_index].state=2;
-		players[p_index].vy=0;
-	} else if(!map.collisions[indY+1][indX])
-		players[p_index].vy=1;
-
-	if(players[p_index].vx>0) {
-		xp=(indX+2>map.width)? map.width : indX+2;
-		xn=indX;
-	} else {
-		xp=indX;
-		xn=(indX-2<0)? 0 : indX-2;
-	}
-
-	//collision on x-axis
-	for(;xn<xp;xn++)
-		if(map.collisions[indY][xn]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][xn].getGlobalBounds(),rect))) {
-			if(map.map[indY][xn]==COLLAPSE_BLOCK) {
-
-			}
-			else if(rect.left>r.left) players[p_index].x-=rect.width;
-			else players[p_index].x+=rect.width;
-			players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
-			break;
-		}
-
+	if(interactEvent) interact(centerX,centerY,deltaTime);
 	jump(deltaTime);
 
-	indY=players[p_index].y/TILE_DIM,indX=players[p_index].x/TILE_DIM;
-	if(players[p_index].vy>=0) {
-		yn=(indY-2<0)? 0 : indY-2;
-		yp=indY+1;
-	} else {
-		yn = indY-1;
-		yp = (indY+2>map.height)? map.height : indY+2;
-	}
+	//check if the player is falling
+	if(players[p_index].state!=2&&map.collisions[down][centerX]==-1&&(map.collisions[down][left]==-1||map.collisions[down][right]==-1)) {
+		players[p_index].state=2;
+		players[p_index].vy=0;
+	} else if(!map.collisions[down][centerX])
+		players[p_index].vy=1;
 
-	//collision on y-axis
-	for(;yn<yp;yn++)
-		if(map.collisions[yn][indX]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[yn][indX].getGlobalBounds(),rect))) {
-			if(rect.top>=r.top) {
-				players[p_index].y-=rect.height;
-				players[p_index].state=(players[p_index].vx!=0)? 1 : 0;
-				players[p_index].spriteRect.left=IDLE_1_OFFSET;
-			} else if(map.map[yn][indX]!=COLLAPSE_BLOCK) players[p_index].y+=rect.height;
-			players[p_index].vy=0;
-			players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
-			r = players[p_index].sprite.getGlobalBounds();
-		}
-
-	if(map.map[indY+1][indX]==COLLAPSE_BLOCK) {
-		for(CollapseBlock cb : collapseBlocks[p_index])
-			if(cb.x==indY+1&&cb.y==indX)
-				collapsingBlocks.push_back(cb);
-	}
-}
-
-void GameLogic::handleCollisions2(const vector<vector<sf::Sprite>> &gmap, float deltaTime) {
-	int indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM,i=1;
-	sf::FloatRect rect;
-	if(map.collisions[indY][indX]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[indY][indX].getGlobalBounds(),rect))) {
-		bool move;
-		while(true) {
-			//search for the closest empty tile (doesn't check every tile)
-			if(indX-i&&map.collisions[indY][indX-i]<=0) {
-				players[p_index].x-=(rect.width+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
-				move=true;
-			} else if(indX+i<map.width&&map.collisions[indY][indX+i]<=0) {
-				players[p_index].x+=(rect.width+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
-				move=true;
-			} else if(indY-i&&map.collisions[indY-i][indX]<=0) {
-				players[p_index].y+=(rect.height+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
-				move=true;
-			} else if(indY+i<map.height&&map.collisions[indY+i][indX]<=0) {
-				players[p_index].y-=(rect.height+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
-				move=true;
-			} else if(indX-i&&indY-i&&map.collisions[indY-i][indX-i]<=0) {
-				players[p_index].x-=(rect.width+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
-				players[p_index].y-=(rect.height+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
-				move=true;
-			} else if(indX+i<map.width&&indY+i<map.height&&map.collisions[indY+i][indX+i]<=0) {
-				players[p_index].x+=(rect.width+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
-				players[p_index].y+=(rect.height+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
-				move=true;
-			} else if(indX+i<map.width&&indY-i&&map.collisions[indY-i][indX+i]<=0) {
-				players[p_index].x+=(rect.width+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
-				players[p_index].y-=(rect.height+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
-				move=true;
-			} else if(indX-i&&indY+i<map.height&&map.collisions[indY+i][indX-i]<=0) {
-				players[p_index].x-=(rect.width+(i-1)*TILE_DIM+PLAYER_DIM_SCALED);
-				players[p_index].y+=(rect.height+(i-1)*TILE_DIM-PLAYER_DIM_SCALED);
-				move=true;
-			}
-			if(move) {
-				indY=(players[p_index].y-OFFSET)/TILE_DIM,indX=players[p_index].x/TILE_DIM;
-				break;
-			}
-			++i;
-		}
+	//collision top
+	if(map.collisions[top-1][centerX]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[top-1][centerX].getGlobalBounds(),rect))) {
+		if(rect.top>=r.top) {
+			players[p_index].y-=rect.height;
+			players[p_index].state=(players[p_index].vx!=0)? 1 : 0;
+			players[p_index].spriteRect.left=IDLE_1_OFFSET;
+		} else if(map.map[top-1][centerX]!=COLLAPSE_BLOCK) players[p_index].y+=rect.height;
+		players[p_index].vy=0;
 		players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
-		if(map.collisions[indY+1][indX]<=0) {
-			players[p_index].vy=0;
-			players[p_index].state=2;
-			players[p_index].y+=players[p_index].speed*deltaTime;
+		r = players[p_index].sprite.getGlobalBounds();
+		centerX=(players[p_index].x)/TILE_DIM;
+		top=(players[p_index].y-PLAYER_DIM_SCALED)/TILE_DIM;
+		down=(players[p_index].y+PLAYER_DIM_SCALED)/TILE_DIM;
+		left=(players[p_index].x-PLAYER_DIM_SCALED)/TILE_DIM;
+		right=(players[p_index].x+PLAYER_DIM_SCALED)/TILE_DIM;
+	}
+	//collision down
+	if(map.collisions[down][centerX]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[down][centerX].getGlobalBounds(),rect))) {
+		if(rect.top>=r.top) {
+			players[p_index].y-=rect.height;
+			players[p_index].state=(players[p_index].vx!=0)? 1 : 0;
+			players[p_index].spriteRect.left=IDLE_1_OFFSET;
+		} else if(map.map[down][centerX]!=COLLAPSE_BLOCK) players[p_index].y+=rect.height;
+		players[p_index].vy=0;
+		players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
+		r = players[p_index].sprite.getGlobalBounds();
+		centerX=(players[p_index].x)/TILE_DIM;
+		top=(players[p_index].y-PLAYER_DIM_SCALED)/TILE_DIM;
+		down=(players[p_index].y+PLAYER_DIM_SCALED)/TILE_DIM;
+		left=(players[p_index].x-PLAYER_DIM_SCALED)/TILE_DIM;
+		right=(players[p_index].x+PLAYER_DIM_SCALED)/TILE_DIM;
+	}
+
+	//collision right
+	if(map.collisions[top][left]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[top][left].getGlobalBounds(),rect))) {
+		if(map.map[top][left]==COLLAPSE_BLOCK) {
 		}
+		else if(rect.left>r.left) players[p_index].x-=rect.width;
+		else players[p_index].x+=rect.width;
+		players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
+		centerX=(players[p_index].x)/TILE_DIM;
+		top=(players[p_index].y-PLAYER_DIM_SCALED)/TILE_DIM;
+		down=(players[p_index].y+PLAYER_DIM_SCALED)/TILE_DIM;
+		right=(players[p_index].x+PLAYER_DIM_SCALED)/TILE_DIM;
+	}
+	//collision right
+	if(map.collisions[top][right]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[top][right].getGlobalBounds(),rect))) {
+		if(map.map[top][right]==COLLAPSE_BLOCK) {
+		}
+		else if(rect.left>r.left) players[p_index].x-=rect.width;
+		else players[p_index].x+=rect.width;
+		players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
+		centerX=(players[p_index].x)/TILE_DIM;
+		down=(players[p_index].y+PLAYER_DIM_SCALED)/TILE_DIM;
+	}
+
+	if(map.map[down][centerX]==COLLAPSE_BLOCK) {
+		for(CollapseBlock cb : collapseBlocks[p_index])
+			if(cb.x==down&&cb.y==centerX)
+				collapsingBlocks.push_back(cb);
 	}
 }
 
@@ -413,21 +381,16 @@ void GameLogic::update(float deltaTime,const vector<std::vector<sf::Sprite>> &gm
 	modifs.clear();
 
 	interactEvent = false;
-	bool reappear1=false,reappear2=false;
-
 	handleEvents(deltaTime,keyCode);
-	handleCollisions(gmap,deltaTime);
-	if(updateCoin(deltaTime)) reappear2=true;
-	p_index=1;
-	handleCollisions(gmap,deltaTime);
-	if(updateCoin(deltaTime)) reappear1=true;
-	
-	if(updateCollapseBlocks(deltaTime)) reappear1=reappear2=true;
-	if(updateTimerBlocks(deltaTime)) reappear1=reappear2=true;
+	updateCollapseBlocks(deltaTime);
+	updateTimerBlocks(deltaTime);
 
-	if(reappear1) handleCollisions2(gmap,deltaTime);
+	updateCoin(deltaTime);
+	handleCollisions(gmap,deltaTime);
+	p_index=1;
+	updateCoin(deltaTime);
+	handleCollisions(gmap,deltaTime);
 	p_index=0;
-	if(reappear2) handleCollisions2(gmap,deltaTime);
 
 	animateElLoco(deltaTime);
 

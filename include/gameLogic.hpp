@@ -84,8 +84,6 @@ class GameLogic {
 		void handleEvents(float deltaTime,int keyCode);
 		void jump(float dt);
 		void handleCollisions(const std::vector<std::vector<sf::Sprite>> &gmap,float dt);
-		//check if the player is on a block that just reappeared, if so, move it on the closest empty tile
-		void handleCollisions2(const std::vector<std::vector<sf::Sprite>> &gmap, float dt);
 		void update(float deltaTime,const std::vector<std::vector<sf::Sprite>> &gmap,int keyCode);
 		void testCollisions(const std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		//-1:makes the player fall, 0: the players can go through (stops the fall), 1: solid object
