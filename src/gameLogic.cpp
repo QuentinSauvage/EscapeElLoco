@@ -21,11 +21,9 @@ void GameLogic::clear() {
 	collapseBlocks[1].clear();
 	collapsingBlocks.clear();
 	gameAudio.timer.stop();
-	players[0].chestOpened=false;
 	players[0].doorOpened=false;
 	players[0].coinBlocks.clear();
 	players[1].coinBlocks.clear();
-	players[1].chestOpened=false;
 	players[1].doorOpened=false;
 }
 
@@ -48,7 +46,7 @@ void GameLogic::addModif(int indX,int indY,int value) {
 int GameLogic::tileType(int tile) const {
 	if(tile==EMPTY||tile==COIN||tile==CHAIR_L||tile==CHAIR_R||tile==BOUQUET||
 	tile==DOOR_BC||tile==DOOR_TC||tile==DOOR_BO||tile==DOOR_TO||
-	tile==KEY||tile==CHEST_L||tile==CHEST_R) return -1;
+	tile==KEY||tile==CHEST_LC||tile==CHEST_RC||tile==CHEST_LO||tile==CHEST_RO) return -1;
 	return tile!=LADDER&&tile!=ROPE&&tile!=ROPE_TOP&&tile!=ROPE_END;
 }
 
@@ -80,10 +78,18 @@ void GameLogic::interact(int indX, int indY,float deltaTime) {
 		Key &key=players[p_index].key;
 		key.collected=true;
 		addModif(key.y,key.x,EMPTY);
-	} else if((map.map[indY][indX]==CHEST_L||map.map[indY][indX]==CHEST_R)&&!players[p_index].chestOpened) {
-		players[p_index].chestOpened=true;
+	} else if((map.map[indY][indX]==CHEST_LC||map.map[indY][indX]==CHEST_RC)) {
 		Key &key=players[p_index].key;
 		addModif(key.y,key.x,KEY);
+		if(map.map[indY][indX]==CHEST_LC) {
+			cout << "left" << endl;
+			addModif(indX,indY,CHEST_LO);
+			addModif(indX+1,indY,CHEST_RO);
+		} else {
+			cout << "right" << endl;
+			addModif(indX-1,indY,CHEST_LO);
+			addModif(indX,indY,CHEST_RO);
+		}
 		gameAudio.playSound(gameAudio.chest);
 	} else if((map.map[indY][indX]==DOOR_TC||map.map[indY][indX]==DOOR_BC)&&players[p_index].key.collected) {
 		players[p_index].doorOpened=true;

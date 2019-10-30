@@ -28,8 +28,10 @@
 #define ROPE 15
 #define ROPE_END 23
 #define ROPE_TOP 7
-#define CHEST_L 30
-#define CHEST_R 31
+#define CHEST_LC 30
+#define CHEST_RC 31
+#define CHEST_LO 92
+#define CHEST_RO 93
 #define KEY 90
 #define DOOR_TC 74
 #define DOOR_BC 82
