@@ -10,6 +10,7 @@
 
 #define LOAD_PLAYER_SPRITE_ERROR "Error when loading character sprite"
 #define DEFAULT_SPEED 300.0f
+#define CLIMB_SPEED 400.0f
 #define PLAYER_DIM 16
 #define RUN_1_OFFSET 414
 #define RUN_2_OFFSET 462
@@ -26,7 +27,7 @@ class Player : public Entity {
 	public:
 		//0:idle, 1:walking, 2:jumping, need enum
 		int state;
-		float speed,vx,vy,timerIdle,timerRun,origin_x,origin_y;
+		float vx,vy,timerIdle,timerRun,originX,originY;
 		bool chestOpened,doorOpened;
 		sf::Sprite sprite,oldSprite;
 		sf::Texture texture;

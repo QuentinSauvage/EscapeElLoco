@@ -183,10 +183,10 @@ void GameLogic::handleEvents(float deltaTime,int keyCode) {
 			}
 		}
 		if(keyCode==sf::Keyboard::R) {
-			players[0].x=players[0].origin_x;
-			players[1].x=players[1].origin_x;
-			players[0].y=players[0].origin_y;
-			players[1].y=players[1].origin_y;
+			players[0].x=players[0].originX;
+			players[1].x=players[1].originX;
+			players[0].y=players[0].originY;
+			players[1].y=players[1].originY;
 			players[0].state=players[1].state=0;
 		}
 		if(keyCode==sf::Keyboard::A) gameAudio.changeState();
@@ -252,24 +252,28 @@ void GameLogic::handleCollisions(const vector<vector<sf::Sprite>> &gmap,float de
 		left=(players[p_index].x-PLAYER_DIM_SCALED)/TILE_DIM;
 		right=(players[p_index].x+PLAYER_DIM_SCALED)/TILE_DIM;
 	}
-	//collision down
-	if(map.collisions[down][centerX]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[down][centerX].getGlobalBounds(),rect))) {
-		if(rect.top>=r.top) {
-			players[p_index].y-=rect.height;
-			players[p_index].state=(players[p_index].vx!=0)? 1 : 0;
-			players[p_index].spriteRect.left=IDLE_1_OFFSET;
-		} else if(map.map[down][centerX]!=COLLAPSE_BLOCK) players[p_index].y+=rect.height;
-		players[p_index].vy=0;
-		players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
-		r = players[p_index].sprite.getGlobalBounds();
-		centerX=(players[p_index].x)/TILE_DIM;
-		top=(players[p_index].y-PLAYER_DIM_SCALED)/TILE_DIM;
-		down=(players[p_index].y+PLAYER_DIM_SCALED)/TILE_DIM;
-		left=(players[p_index].x-PLAYER_DIM_SCALED)/TILE_DIM;
-		right=(players[p_index].x+PLAYER_DIM_SCALED)/TILE_DIM;
-	}
 
-	//collision right
+	//collision down
+	int limY=-players[p_index].vy;
+	limY=(limY>JUMP_VELOCITY)?limY/JUMP_VELOCITY:0;
+	for(int i=0;i<=limY;++i) {
+		if(map.collisions[down+i][centerX]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[down+i][centerX].getGlobalBounds(),rect))) {
+			if(rect.top>=r.top) {
+				players[p_index].y-=rect.height;
+				players[p_index].state=(players[p_index].vx!=0)? 1 : 0;
+				players[p_index].spriteRect.left=IDLE_1_OFFSET;
+			} else if(map.map[down+i][centerX]!=COLLAPSE_BLOCK) players[p_index].y+=rect.height;
+			players[p_index].vy=0;
+			players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
+			r = players[p_index].sprite.getGlobalBounds();
+			centerX=(players[p_index].x)/TILE_DIM;
+			top=(players[p_index].y-PLAYER_DIM_SCALED)/TILE_DIM;
+			down=(players[p_index].y+PLAYER_DIM_SCALED)/TILE_DIM;
+			left=(players[p_index].x-PLAYER_DIM_SCALED)/TILE_DIM;
+			right=(players[p_index].x+PLAYER_DIM_SCALED)/TILE_DIM;
+		}
+	}
+	//collision left
 	if(map.collisions[top][left]>0 && (players[p_index].sprite.getGlobalBounds().intersects(gmap[top][left].getGlobalBounds(),rect))) {
 		if(map.map[top][left]==COLLAPSE_BLOCK) {
 		}

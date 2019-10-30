@@ -1,13 +1,13 @@
 #include "player.hpp"
 #include <iostream>
 
-Player::Player() : Entity(),speed(DEFAULT_SPEED),chestOpened(false),doorOpened(false),spriteRect(IDLE_1_OFFSET,OFFSET_Y,PLAYER_DIM,PLAYER_DIM) {} 
+Player::Player() : Entity(),chestOpened(false),doorOpened(false),spriteRect(IDLE_1_OFFSET,OFFSET_Y,PLAYER_DIM,PLAYER_DIM) {} 
 
 void Player::init(float x,float y,std::string path){
 	this->x=x;
 	this->y=y;
-	origin_x=x;
-	origin_y=y;
+	originX=x;
+	originY=y;
 	vx=vy=state=timerIdle=timerRun=0;
 	if(!texture.loadFromFile(path)) {
     	std::cerr << LOAD_PLAYER_SPRITE_ERROR << std::endl;
@@ -61,13 +61,13 @@ void Player::animate(float timer) {
 void Player::climb(bool climbing,float deltaTime) {
 	vy=0;
 	state=2;
-	if(climbing) y-=speed*deltaTime;
-	else y+=speed*deltaTime;
+	if(climbing) y-=CLIMB_SPEED*deltaTime;
+	else y+=CLIMB_SPEED*deltaTime;
 }
 
 void Player::move(int dir,float deltaTime) {
 	vx=dir;
-	x+=dir*speed*deltaTime;
+	x+=dir*DEFAULT_SPEED*deltaTime;
 }
 
 Player::~Player() {}
