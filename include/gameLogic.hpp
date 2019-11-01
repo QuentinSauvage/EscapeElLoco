@@ -58,6 +58,10 @@ class GameLogic {
 			std::vector<std::vector<int>> map;
 			std::vector<std::vector<int>> collisions;
 		};
+		struct Box {
+			unsigned char flags : 6;
+			int top,down,left,right,centerX,centerY;
+		};
 		struct Modif {
 			int x,y,value,w,h;
 		};
@@ -93,6 +97,7 @@ class GameLogic {
 		bool updateTimerBlocks(float deltaTime);
 		void animateElLoco(float deltaTime);
 		void addModif(int indX,int indY,int value);
+		void initBox(Box &b) const;
 		~GameLogic();
 };
 
