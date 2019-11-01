@@ -27,7 +27,7 @@ class Player : public Entity {
 	public:
 		//0:idle, 1:walking, 2:jumping, need enum
 		int state;
-		float vx,vy,timerIdle,timerRun,originX,originY;
+		float vx,vy,timerIdle,timerRun,originX,originY,oldX;
 		bool chestOpened,doorOpened;
 		sf::Sprite sprite,oldSprite;
 		sf::Texture texture;

@@ -8,8 +8,6 @@
 #include "player.hpp"
 #include "block.hpp"
 
-#define POSX1 512
-#define POSX2 2112
 #define POSY 1695
 #define PATH_LEVEL "levels/level"
 #define CSV ".csv"
@@ -84,6 +82,7 @@ class GameLogic {
 		void handleEvents(float deltaTime,int keyCode);
 		void jump(float dt);
 		void handleCollisions(const std::vector<std::vector<sf::Sprite>> &gmap,float dt);
+		void handleCollisions2(const std::vector<std::vector<sf::Sprite>> &gmap, float dt);
 		void update(float deltaTime,const std::vector<std::vector<sf::Sprite>> &gmap,int keyCode);
 		void testCollisions(const std::vector<std::vector<sf::Sprite>> &gmap,float dt);
 		//-1:makes the player fall, 0: the players can go through (stops the fall), 1: solid object

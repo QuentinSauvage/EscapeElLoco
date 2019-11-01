@@ -67,7 +67,10 @@ void Player::climb(bool climbing,float deltaTime) {
 
 void Player::move(int dir,float deltaTime) {
 	vx=dir;
+	oldX=x;
 	x+=dir*DEFAULT_SPEED*deltaTime;
+	if(dir) oldX=x-oldX;
+	else oldX-=x;
 }
 
 Player::~Player() {}
