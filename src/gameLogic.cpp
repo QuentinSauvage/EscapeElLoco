@@ -246,7 +246,7 @@ void GameLogic::handleCollisions(const vector<vector<sf::Sprite>> &gmap,float de
 				players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
 				r = players[p_index].sprite.getGlobalBounds();
 				b.flags=61;
-				initBox(b);
+				//initBox(b);
 				break;
 			}
 		}
@@ -260,7 +260,7 @@ void GameLogic::handleCollisions(const vector<vector<sf::Sprite>> &gmap,float de
 			players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
 			r = players[p_index].sprite.getGlobalBounds();
 			b.flags=61;
-			initBox(b);
+			//initBox(b);
 			break;
 		}
 	}
@@ -274,7 +274,7 @@ void GameLogic::handleCollisions(const vector<vector<sf::Sprite>> &gmap,float de
 				players[p_index].x+=rect.width;
 				players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
 				b.flags=61;
-				initBox(b);
+				//initBox(b);
 				break;
 			}
 		}
@@ -284,7 +284,7 @@ void GameLogic::handleCollisions(const vector<vector<sf::Sprite>> &gmap,float de
 				players[p_index].x-=rect.width;
 				players[p_index].sprite.setPosition(players[p_index].x,players[p_index].y);
 				b.flags=9;
-				initBox(b);
+				//initBox(b);
 				break;
 			}
 		}
@@ -306,6 +306,7 @@ void GameLogic::handleCollisions(const vector<vector<sf::Sprite>> &gmap,float de
 
 void GameLogic::handleCollisions2(const vector<vector<sf::Sprite>> &gmap, float deltaTime) {
 	Box b;
+	b.flags=63;
 	initBox(b);
 	sf::FloatRect rect;
 	int i=1;
