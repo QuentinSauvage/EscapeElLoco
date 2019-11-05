@@ -117,8 +117,10 @@ void GameGraphics::drawBackground(int k) {
     if(y2>gameLogic.map.height) y2=gameLogic.map.height;
 
     for(int i=y1;i<y2;i++)
-        for(int j=x1;j<x2;j++)
-            window.draw(map[i][j]);
+        for(int j=x1;j<x2;j++) {
+            if(gameLogic.map.map[i][j]!=EMPTY)
+                window.draw(map[i][j]);
+        }
 }
 
 void GameGraphics::buildWindow() {
