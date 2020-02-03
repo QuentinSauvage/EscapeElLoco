@@ -1,5 +1,5 @@
 # Escape El Loco
-This platformer was made during my final year of master's degree. It is made using C++ and the SFML API and its goal is to keep the game running at 60fps by correctly managing the game loop correctly.
+This platformer was made during my final year of master's degree. It is made using C++ and the SFML API and its goal is to keep the game running at 60fps by correctly managing the game loop.
 
 # Controls
 _←/→_ : Move on the X-axis.
@@ -38,8 +38,13 @@ make && ./app
 
 # Arts
 Music: https://freesound.org/people/envirOmaniac2/sounds/376454/
+
 Jump audio: https://freesound.org/people/OwlStorm/sounds/404793/
+
 Chest audio: https://freesound.org/people/ssierra1202/sounds/391947/
+
 Timer: The Legend of Zelda - Ocarina of Time (Nintendo)
+
 Dino characters: https://arks.itch.io/dino-characters
+
 Tileset: https://rottingpixels.itch.io/castle-platformer-tileset-16x16free
