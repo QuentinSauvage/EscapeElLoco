@@ -1,7 +1,7 @@
 #-Wextra  -pedantic -Wno-unused-parameter -Wall -Wextra -ansi
 CFLAGS = -std=c++11 -Wall
 SFML = -lsfml-graphics -lsfml-audio -lsfml-window -lsfml-system
-EXEC = app
+EXEC = bin/app
 
 #BOOST = -I boost
 
@@ -19,6 +19,6 @@ app: main.cpp $(OBJ_FILES)
 	$(CXX) $(INC) $(BOOST) -o $(EXEC) $^ $(SFML)
 
 clean:
-	rm -rf obj/*.o $(EXEC) app
+	rm -rf obj/*.o $(EXEC)
 
 

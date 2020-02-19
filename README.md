@@ -33,7 +33,7 @@ They have to escape each rooms by opening the door relative to their side. To do
 
 # Build & Run
 ```shell
-make && ./app
+make && ./bin/app
 ```
 
 # Arts
